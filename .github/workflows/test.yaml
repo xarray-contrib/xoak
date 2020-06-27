@@ -25,7 +25,7 @@ jobs:
           pip install poetry
       - name: Set up env
         run: |
-          poetry install --dev
+          poetry install
       - name: Test
         run: |
           poetry run pytest
