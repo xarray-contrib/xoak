@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "xoak"
 version = "0.1.0"
-description = ""
+description = "Xoak is a xarray extension that provides tree-based indexes used for selecting irregular, n-dimensional data."
 authors = ["Benoît Bovy <bbovy@gfz-potsdam.de>", "Willi Rath <wrath@geomar.de>"]
 
 [tool.poetry.dependencies]
