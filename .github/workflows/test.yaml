@@ -27,6 +27,8 @@ jobs:
       - name: Set up env
         run: |
           poetry install
+      - name: Lint
+        run: poetry run black .
       - name: Test
         run: |
           poetry run pytest
