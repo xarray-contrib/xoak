@@ -5,7 +5,7 @@ description = "Xoak is a xarray extension that provides tree-based indexes used 
 authors = ["Benoît Bovy <bbovy@gfz-potsdam.de>", "Willi Rath <wrath@geomar.de>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 sklearn = "^0.0"
 xarray = "^0.15.1"
 numpy = "^1.19.0"
