@@ -28,7 +28,7 @@ jobs:
         run: |
           poetry install
       - name: Lint
-        run: poetry run black .
+        run: poetry run black --check .
       - name: Test
         run: |
           poetry run pytest

@@ -52,4 +52,3 @@ def test_indexer(dataset, indexer, array_lib):
 
     # ensure same shape
     assert ds_sel.field.shape == indexer.longitude.shape
-
