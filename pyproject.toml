@@ -10,10 +10,11 @@ sklearn = "^0.0"
 xarray = "^0.15.1"
 numpy = "^1.19.0"
 dask = {extras = ["array"], version = "^2.19.0"}
-pytest-cov = "^2.10.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+pytest-cov = "^2.10.0"
+black = "^19.10b0"
 
 [build-system]
 requires = ["poetry>=0.12"]
