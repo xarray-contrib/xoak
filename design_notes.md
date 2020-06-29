@@ -48,6 +48,7 @@ however, xoak might benefit of its own implementations. Motivations are:
 
 - Data structures not available elsewhere (Python packages)
 - More flexible implementations (e.g., allow user-defined distance functions)
+- More control of underlying parallelisation, e.g., with Dask
 
 Possible solutions for efficient implementation and their main advantage:
 
@@ -64,7 +65,7 @@ Possible solutions for efficient implementation and their main advantage:
 The current, recommended way to extend Xarray is via
 [accessors](http://xarray.pydata.org/en/stable/internals.html#extending-xarray).
 
-*One vs. multiple accessors*
+#### One vs. multiple accessors
 
 We have two options:
 
@@ -83,13 +84,13 @@ Option B has the advantage of not polluting too much ``Dataset``'s and
 both optimal range and nearest neighbor queries could be done, e.g., using
 a hybrid/compound index.
 
-*Consistency with Xarray indexing API*
+#### Consistency with Xarray indexing API
 
 The API exposed in the accessor(s) should be as close as possible to xarray's
 API used for setting new indexes and using them for selection. There should be a
 clear separation between index construction and data selection (queries).
 
-*Index construction*
+#### Index construction
 
 ```python
 ds.xoak.set_index(coord_list, index_type='kdtree', transform=None, **index_kwargs)
@@ -112,13 +113,13 @@ ds.xoak.set_index(coord_list, index_type='kdtree', transform=None, **index_kwarg
 - ``**index_kwargs`` are keyword arguments passed to the underlying tree index
   Python classes (e.g., for setting the metric, the tree leaf size, etc.).
   
-*Access to the underlying index*
+#### Access to the underlying index
 
 ```python
 ds.xoak.index
 ```
 
-*Selecting data*
+#### Selecting data
 
 ```python
 ds.xoak.sel(tolerance=None, **indexers)
@@ -162,7 +163,7 @@ lat/lon coordinates into XYZ cartesian coordinates.
 ### Low-level API
 
 In case xoak will eventually have its own index implementations, it should also
-provide a low-level API for reusing the indexes outside of Xarray.
+provide a low-level API for reusing or inspecting the indexes outside of Xarray.
 Alternatively, those implementations could be maintained in a 3rd-party package.
 
 ### Indexing operations not supported by xarray
@@ -210,10 +211,10 @@ There are two possible cases:
 
 Possible issues are:
 
-- loading all coordinate data into memory
+- keeping all *coordinate* data in memory at the same time
 - tree construction time
-- tree storage in memory
-- loading all indexer data into memory
+- keeping the whole tree in memory
+- keeping all *indexer* data in memory at the same time
 - selection (query) time
 
 Some potential sources of inspiration:
