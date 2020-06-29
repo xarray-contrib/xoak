@@ -37,6 +37,8 @@ A few structures are available in Python:
 - A kd-tree is implemented in the
   [scipy.spatial](https://docs.scipy.org/doc/scipy/reference/spatial.html)
   sub-package
+- An alternative kd-tree implementation can be found in
+  [pykdtree](https://github.com/storpipfugl/pykdtree).
 - [libpysal](https://github.com/pysal/libpysal) adds support for arc distance on
   top of scipy's k-d tree
 - [scikit-learn](https://scikit-learn.org) has k-d tree and ball tree implementations
