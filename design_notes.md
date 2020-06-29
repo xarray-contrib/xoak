@@ -165,20 +165,20 @@ In case xoak will eventually have its own index implementations, it should also
 provide a low-level API for reusing the indexes outside of Xarray.
 Alternatively, those implementations could be maintained in a 3rd-party package.
 
-## Indexing operations not supported by xarray
+### Indexing operations not supported by xarray
 
 Data partitioning trees often allow queries other than just range and/or nearest
 neighbor searches, e.g., k-nearest neighbor search, radius-based search, point
 density/count, compute distances, selection of objects, etc. How to expose those
 queries in xoak remains an open question.
 
-## Other operations supported by xarray
+### Other operations supported by xarray
 
 Data partitioning trees have also the potential to be reused in important xarray
 features other than data selection such as, e.g., group-by operations. How to
 handle those operations with xoak remains an open question too.
 
-## Internals
+## 5. Internals
 
 Instead of directly reusing tree-based indexes in 3rd party packages, we might
 need to write some thin wrappers around them in order to:
@@ -189,7 +189,7 @@ need to write some thin wrappers around them in order to:
 - index serialization (see below)
 - etc.
 
-## Index serialization / reconstruction
+## 6. Index serialization / reconstruction
 
 Building a tree index can be time consuming. xoak should allow saving/loading
 indexes. This could be done independently of the data in xarray objects by
@@ -198,7 +198,7 @@ pickling the index objects.
 A more general solution has still to be found on the xarray side. This will
 probably be addressed during the implementation of flexible indexes.
 
-## dask support, distributed / out-of-core indexes
+## 7. dask support -- distributed / out-of-core indexes
 
 Most data partitioning trees are centralized structures, making it hard to use
 in the context of distributed or out-of-core computation.
