@@ -69,8 +69,8 @@ The current, recommended way to extend Xarray is via
 
 We have two options:
 
-A. one accessor per kind of index, e.g., ``Dataset.kdtree``, ``Dataset.balltree``, etc.
-B. one unique accessor ``Dataset.xoak`` for handling all kinds of indexes.
+- *A.* one accessor per kind of index, e.g., ``Dataset.kdtree``, ``Dataset.balltree``, etc.
+- *B.* one unique accessor ``Dataset.xoak`` for handling all kinds of indexes.
 
 Choosing option A vs option B will depend on how much the indexes may have in
 common (regarding both the internal logic and the exposed API).
@@ -83,6 +83,8 @@ Option B has the advantage of not polluting too much ``Dataset``'s and
 ``DataArray``'s namespace, and may result in less code repetition. Supporting
 both optimal range and nearest neighbor queries could be done, e.g., using
 a hybrid/compound index.
+
+We will consider option B further below in this document.
 
 #### Consistency with Xarray indexing API
 
@@ -100,8 +102,8 @@ ds.xoak.set_index(coord_list, index_type='kdtree', transform=None, **index_kwarg
   coordinates can be either 1-dimensional or n-dimensional. All coordinates
   given here must have the same dimensions.
   
-- ``index_type`` (str) is the type of index used (if we choose option B above).
-  This could also accept classes if we want to allow extending xoak.
+- ``index_type`` (str) is the type of index used. This could also accept classes
+  if we want to allow extending xoak.
   
 - ``tranform`` (callable) is optional and would allow some transformation
   applied to the coordinate labels before building (and querying) the index. For
