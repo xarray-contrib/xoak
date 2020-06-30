@@ -45,13 +45,12 @@ def indexer(request, array_lib):
 
 
 @pytest.mark.parametrize("metric", ["minkowski", None])
-def test_indexer(dataset, indexer, array_lib, metric):
+def test_indexer(dataset, indexer, metric):
     """Select the dataset with positions from the indexer."""
     # create index
+    kwargs = {}
     if metric is not None:
-        kwargs = {"metric": metric}
-    else:
-        kwargs = {}
+        kwargs.update({"metric": metric})
     dataset.xoak.set_index(["z", "y", "x"], **kwargs)
 
     # select with indexer
@@ -61,3 +60,14 @@ def test_indexer(dataset, indexer, array_lib, metric):
 
     # ensure same shape
     assert ds_sel.field.shape == indexer.x_points.shape
+
+
+@pytest.mark.xfail(reason="Tolerance not working yet.")
+def test_zero_tolerance(dataset, indexer):
+    # set index
+    dataset.xoak.set_index(["z", "y", "x"])
+
+    # select with zero tolerance
+    ds_sel, dist = dataset.xoak.sel(
+        z=indexer.z_points, y=indexer.y_points, x=indexer.x_points, tolerance=0.0
+    )
