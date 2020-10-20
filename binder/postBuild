@@ -1,0 +1,5 @@
+set -ex
+
+echo "Installing poetry environment"
+
+poetry install
