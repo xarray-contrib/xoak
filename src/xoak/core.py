@@ -1,10 +1,33 @@
 import numbers
-from typing import Any, Callable, Iterable, Hashable, List, Mapping, Union
+from typing import Any, Iterable, Hashable, List, Mapping, Type, Union
 
 import numpy as np
 import xarray as xr
 from xarray.core.utils import either_dict_or_kwargs
-from sklearn.neighbors import BallTree
+
+from .indexes.base import Index, IndexWrapper, normalize_index
+
+
+def coords_to_point_array(coords: List[Any]):
+    """Re-arrange data from a list of xarray coordinates into a 2-d array of shape
+    (npoints, ncoords).
+
+    """
+    c_chunks = [c.chunks for c in coords]
+
+    if any([chunks is None for chunks in c_chunks]):
+        # plain numpy arrays (maybe triggers compute)
+        X = np.stack([np.ravel(c) for c in coords]).T
+
+    else:
+        import dask.array as da
+
+        # TODO: check chunks are equal for all coords?
+
+        X = da.stack([da.ravel(c.data) for c in coords]).T
+        X = X.rechunk((X.chunks[0], len(coords)))
+
+    return X
 
 
 @xr.register_dataarray_accessor("xoak")
@@ -20,45 +43,52 @@ class XoakAccessor:
         self._xarray_obj = xarray_obj
 
         self._index = None
+        self._index_cls = None
         self._index_coords = None
         self._index_coords_dims = None
         self._index_coords_shape = None
 
-        self._transform = None
+    def _build_index_forest_delayed(self, X, **kwargs) -> List[Any]:
+        import dask
 
-    def _stack(self, coords: List[Any]):
-        """Stack and maybe transform coordinate labels into a format
-        compliant with sklearn's BallTree, i.e., a 2-d array (npoints, nfeatures).
-    
-        """
-        X = np.stack([np.ravel(arr) for arr in coords]).T
+        indexes = []
+        offset = 0
 
-        if self._transform is not None:
-            return self._transform(X)
-        else:
-            return X
+        for i, chunk in enumerate(X.to_delayed().ravel()):
+            idx = dask.delayed(self._index_cls)(chunk, offset, **kwargs)
+            indexes.append(idx)
 
-    def set_index(self, coords: Iterable[str], transform: Callable = None, **kwargs):
-        """Create a ball tree index from a subset of coordinates of
-        the DataArray / Dataset.
+            offset += X.chunks[0][i]
+
+        return indexes
+
+    def set_index(
+            self,
+            coords: Iterable[str],
+            index_type: Union[str, Type[IndexWrapper]],
+            persist: bool = True,
+            **kwargs
+    ):
+        """Create an index tree from a subset of coordinates of the DataArray / Dataset.
+
+        If the given coordinates are chunked (Dask arrays), this method will (lazily) create
+        a forest of index trees (one tree per chunk of the flattened coordinate arrays).
         
         Parameters
         ----------
         coords : iterable
             Coordinate names. Each given coordinate must have
             the same dimension(s), in the same order.
-        transform : callable, optional
-            Any function used to convert coordinate labels. This is useful,
-            e.g., for converting degrees to radians when using the haversine metric.
-            This transform will also be applied each time before indexing (query). 
+        index_type : str or :class:`xoak.IndexWrapper` subclass
+            Either one of the registered index types or a custom index wrapper class.
+        persist: bool
+            If True, this method will precompute and persist in memory the forest of index
+            trees, if any (default: True).
         **kwargs
-            Arguments passed to :class:`sklearn.neighbors.BallTree`
-            constructor.
+            Keyword arguments that will be passed to the underlying index constructor.
 
         """
-        if transform is not None:
-            self._transform = transform
-
+        self._index_cls = normalize_index(index_type)
         self._index_coords = tuple(coords)
 
         coord_objs = [self._xarray_obj.coords[cn] for cn in coords]
@@ -71,28 +101,39 @@ class XoakAccessor:
         self._index_coords_dims = coord_objs[0].dims
         self._index_coords_shape = coord_objs[0].shape
 
-        X = self._stack([self._xarray_obj[c] for c in coords])
+        X = coords_to_point_array([self._xarray_obj[c] for c in coords])
 
-        self._index = BallTree(X, **kwargs)
+        if isinstance(X, np.ndarray):
+            self._index = self._index_cls(X, 0, **kwargs)
+
+        else:
+            import dask
+
+            self._index = self._build_index_forest_delayed(X, **kwargs)
+
+            if persist:
+                dask.persist(*self._index)
 
     @property
-    def index(self) -> BallTree:
-        """Returns the underlying ball tree index."""
+    def index(self) -> Index:
+        """Returns the underlying index object."""
 
-        return self._index
-
-    def _query(self, indexers, tolerance):
-        """Query the ball tree and maybe reject selected points
-        based on tolerance (distance threshold).
-        
-        """
-        X = self._stack([indexers[c] for c in self._index_coords])
-
-        if tolerance is None:
-            return self._index.query(X, return_distance=False)
+        if isinstance(self._index, list):
+            import dask
+            return dask.compute(*self._index)
         else:
-            dist, indices = self._index.query(X, return_distance=True)
-            return indices[dist <= tolerance]
+            return self._index._index
+
+    def _query(self, indexers):
+        """Query the index. """
+        X = coords_to_point_array([indexers[c] for c in self._index_coords])
+
+        if isinstance(X, np.ndarray) and not isinstance(self._index, list):
+            result = self._index.query(X)
+            return result["positions"][:, 0]
+        else:
+            # TODO: implement two-stage query with dask
+            raise NotImplementedError
 
     def _get_pos_indexers(self, indices, indexers):
         """Returns positional indexers based on the query results and the
@@ -123,7 +164,6 @@ class XoakAccessor:
     def sel(
         self,
         indexers: Mapping[Hashable, Any] = None,
-        tolerance: numbers.Number = None,
         **indexers_kwargs: Any
     ) -> Union[xr.Dataset, xr.DataArray]:
         """Selection based on a ball tree index.
@@ -143,12 +183,11 @@ class XoakAccessor:
         """
         if self._index is None:
             raise ValueError(
-                "The ball tree index has not been built yet. "
-                "Call `.xoak.set_index()` first"
+                "The index(es) has/have not been built yet. Call `.xoak.set_index()` first"
             )
 
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "xoak.sel")
-        indices = self._query(indexers, tolerance)
+        indices = self._query(indexers)
         pos_indexers = self._get_pos_indexers(indices, indexers)
 
         result = self._xarray_obj.isel(indexers=pos_indexers)
