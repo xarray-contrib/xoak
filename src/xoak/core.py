@@ -1,14 +1,27 @@
-import numbers
-from typing import Any, Iterable, Hashable, List, Mapping, Type, Union
+from typing import (
+    Any,
+    Iterable,
+    Hashable,
+    List,
+    Mapping,
+    Tuple,
+    Type,
+    Union,
+)
 
 import numpy as np
 import xarray as xr
 from xarray.core.utils import either_dict_or_kwargs
 
-from .indexes.base import Index, IndexWrapper, normalize_index
+from .index.base import Index, IndexAdapter, XoakIndexWrapper
+
+try:
+    from dask.delayed import Delayed
+except ImportError:
+    Delayed = Type[None]
 
 
-def coords_to_point_array(coords: List[Any]):
+def coords_to_point_array(coords: List[Any]) -> np.ndarray:
     """Re-arrange data from a list of xarray coordinates into a 2-d array of shape
     (npoints, ncoords).
 
@@ -30,6 +43,10 @@ def coords_to_point_array(coords: List[Any]):
     return X
 
 
+IndexAttr = Union[XoakIndexWrapper, Iterable[XoakIndexWrapper], Iterable[Delayed]]
+IndexType = Union[str, Type[IndexAdapter]]
+
+
 @xr.register_dataarray_accessor("xoak")
 @xr.register_dataset_accessor("xoak")
 class XoakAccessor:
@@ -37,35 +54,36 @@ class XoakAccessor:
     n-dimensional data using a ball tree.
     
     """
+    _index: IndexAttr
+    _index_type: IndexType
+    _index_coords: Tuple[str]
+    _index_coords_dims: Tuple[Hashable, ...]
+    _index_coords_shape: Tuple[int, ...]
 
     def __init__(self, xarray_obj: Union[xr.Dataset, xr.DataArray]):
-
         self._xarray_obj = xarray_obj
 
-        self._index = None
-        self._index_cls = None
-        self._index_coords = None
-        self._index_coords_dims = None
-        self._index_coords_shape = None
-
-    def _build_index_forest_delayed(self, X, **kwargs) -> List[Any]:
+    def _build_index_forest_delayed(self, X, persist=False, **kwargs) -> IndexAttr:
         import dask
 
         indexes = []
         offset = 0
 
         for i, chunk in enumerate(X.to_delayed().ravel()):
-            idx = dask.delayed(self._index_cls)(chunk, offset, **kwargs)
-            indexes.append(idx)
-
+            indexes.append(
+                dask.delayed(XoakIndexWrapper)(self._index_type, chunk, offset, **kwargs)
+            )
             offset += X.chunks[0][i]
 
-        return indexes
+        if persist:
+            return dask.persist(*indexes)
+        else:
+            return tuple(indexes)
 
     def set_index(
             self,
             coords: Iterable[str],
-            index_type: Union[str, Type[IndexWrapper]],
+            index_type: IndexType,
             persist: bool = True,
             **kwargs
     ):
@@ -77,18 +95,18 @@ class XoakAccessor:
         Parameters
         ----------
         coords : iterable
-            Coordinate names. Each given coordinate must have
-            the same dimension(s), in the same order.
+            Coordinate names. Each given coordinate must have the same dimension(s),
+            in the same order.
         index_type : str or :class:`xoak.IndexWrapper` subclass
             Either one of the registered index types or a custom index wrapper class.
         persist: bool
-            If True, this method will precompute and persist in memory the forest of index
-            trees, if any (default: True).
+            If True (default), this method will precompute and persist in memory the forest
+            of index trees, if any.
         **kwargs
             Keyword arguments that will be passed to the underlying index constructor.
 
         """
-        self._index_cls = normalize_index(index_type)
+        self._index_type = index_type
         self._index_coords = tuple(coords)
 
         coord_objs = [self._xarray_obj.coords[cn] for cn in coords]
@@ -104,31 +122,29 @@ class XoakAccessor:
         X = coords_to_point_array([self._xarray_obj[c] for c in coords])
 
         if isinstance(X, np.ndarray):
-            self._index = self._index_cls(X, 0, **kwargs)
-
+            self._index = XoakIndexWrapper(self._index_type, X, 0, **kwargs)
         else:
-            import dask
-
-            self._index = self._build_index_forest_delayed(X, **kwargs)
-
-            if persist:
-                dask.persist(*self._index)
+            self._index = self._build_index_forest_delayed(X, persist=persist, **kwargs)
 
     @property
-    def index(self) -> Index:
-        """Returns the underlying index object."""
+    def index(self) -> Union[Index, Iterable[Index]]:
+        """Returns the underlying index object(s).
 
-        if isinstance(self._index, list):
-            import dask
-            return dask.compute(*self._index)
+        May trigger computation of lazy indexes.
+
+        """
+        if isinstance(self._index, XoakIndexWrapper):
+            return self._index.index
         else:
-            return self._index._index
+            import dask
+            index_wrappers = dask.compute(*self._index)
+            return [wrp.index for wrp in index_wrappers]
 
     def _query(self, indexers):
         """Query the index. """
         X = coords_to_point_array([indexers[c] for c in self._index_coords])
 
-        if isinstance(X, np.ndarray) and not isinstance(self._index, list):
+        if isinstance(X, np.ndarray) and isinstance(self._index, XoakIndexWrapper):
             result = self._index.query(X)
             return result["positions"][:, 0]
         else:
@@ -152,9 +168,9 @@ class XoakAccessor:
         if len(set(indexer_dims)) > 1:
             raise ValueError("All indexers must have the same dimensions.")
 
-        u_indices = np.unravel_index(indices.ravel(), self._index_coords_shape)
+        u_indices = list(np.unravel_index(indices.ravel(), self._index_coords_shape))
 
-        for dim, ind in zip(*[self._index_coords_dims, u_indices]):
+        for dim, ind in zip(self._index_coords_dims, u_indices):
             pos_indexers[dim] = xr.Variable(
                 indexer_dims[0], ind.reshape(indexer_shapes[0])
             )
@@ -168,8 +184,7 @@ class XoakAccessor:
     ) -> Union[xr.Dataset, xr.DataArray]:
         """Selection based on a ball tree index.
         
-        The index must have been already built using
-        `xoak.set_index()`.
+        The index must have been already built using `xoak.set_index()`.
         
         It behaves mostly like :meth:`xarray.Dataset.sel` and
         :meth:`xarray.DataArray.sel` methods, with some limitations:
