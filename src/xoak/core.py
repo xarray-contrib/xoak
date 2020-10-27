@@ -141,17 +141,70 @@ class XoakAccessor:
             return [wrp.index for wrp in index_wrappers]
 
     def _query(self, indexers):
-        """Query the index. """
         X = coords_to_point_array([indexers[c] for c in self._index_coords])
 
         if isinstance(X, np.ndarray) and isinstance(self._index, XoakIndexWrapper):
-            result = self._index.query(X)
-            return result["positions"][:, 0]
-        else:
-            # TODO: implement two-stage query with dask
-            raise NotImplementedError
+            # directly call index wrapper's query method
+            res = self._index.query(X)
+            results = res["positions"][:, 0]
 
-    def _get_pos_indexers(self, indices, indexers):
+        else:
+            # Two-stage lazy query with dask
+            import dask
+            import dask.array as da
+
+            # coerce query array as a dask array and index(es) as an iterable
+            if isinstance(X, np.ndarray):
+                X = da.from_array(X, chunks=X.shape)
+
+            if isinstance(self._index, XoakIndexWrapper):
+                indexes = [self._index]
+            else:
+                indexes = self._index
+
+            # 1st "map" stage:
+            # - execute `IndexWrapperCls.query` for each query array chunk and each index instance
+            # - concatenate all distances/positions results in two dask arrays of shape (n_points, n_indexes)
+
+            res_chunk = []
+
+            for i, chunk in enumerate(X.to_delayed().ravel()):
+                res_chunk_idx = []
+
+                chunk_npoints = X.chunks[0][i]
+                shape = (chunk_npoints, 1)
+
+                for idx in indexes:
+                    dlyd = dask.delayed(idx.query)(chunk)
+                    res_chunk_idx.append(
+                        da.from_delayed(dlyd, shape, dtype=XoakIndexWrapper._query_result_dtype)
+                    )
+
+                res_chunk.append(da.concatenate(res_chunk_idx, axis=1))
+
+            map_results = da.concatenate(res_chunk, axis=0)
+            distances = map_results["distances"]
+            positions = map_results["positions"]
+
+            # 2nd "reduce" stage:
+            # - brute force lookup over the indexes dimension (columns)
+
+            col_positions = da.argmin(distances, axis=1)
+
+            results = da.blockwise(
+                lambda arr, col_pos: np.take_along_axis(arr, col_pos[:, None], 1),
+                'i',
+                positions,
+                'ik',
+                col_positions,
+                'i',
+                dtype=np.intp,
+                concatenate=True
+            )
+
+        return results
+
+    def _get_pos_indexers(self, indices, indexers, compute=False):
         """Returns positional indexers based on the query results and the
         original (label-based) indexers.
         
@@ -167,6 +220,9 @@ class XoakAccessor:
 
         if len(set(indexer_dims)) > 1:
             raise ValueError("All indexers must have the same dimensions.")
+
+        if compute and not isinstance(indices, np.ndarray):
+            indices = indices.compute()
 
         u_indices = list(np.unravel_index(indices.ravel(), self._index_coords_shape))
 
@@ -194,6 +250,9 @@ class XoakAccessor:
           objects
         - Use it for nearest neighbor lookup only (it implicitly
           assumes method="nearest")
+
+        This triggers :func:`dask.compute` if the given indexers and/or the index
+        coordinates are chunked.
         
         """
         if self._index is None:
@@ -203,7 +262,7 @@ class XoakAccessor:
 
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "xoak.sel")
         indices = self._query(indexers)
-        pos_indexers = self._get_pos_indexers(indices, indexers)
+        pos_indexers = self._get_pos_indexers(indices, indexers, compute=True)
 
         result = self._xarray_obj.isel(indexers=pos_indexers)
 
