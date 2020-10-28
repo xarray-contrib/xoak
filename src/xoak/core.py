@@ -150,7 +150,7 @@ class XoakAccessor:
         if isinstance(X, np.ndarray) and isinstance(self._index, XoakIndexWrapper):
             # directly call index wrapper's query method
             res = self._index.query(X)
-            results = res["positions"][:, 0]
+            results = res["indices"][:, 0]
 
         else:
             # Two-stage lazy query with dask
@@ -190,19 +190,19 @@ class XoakAccessor:
 
             map_results = da.concatenate(res_chunk, axis=0)
             distances = map_results["distances"]
-            positions = map_results["positions"]
+            indices = map_results["indices"]
 
             # 2nd "reduce" stage:
             # - brute force lookup over the indexes dimension (columns)
 
-            col_positions = da.argmin(distances, axis=1)
+            indices_col = da.argmin(distances, axis=1)
 
             results = da.blockwise(
-                lambda arr, col_pos: np.take_along_axis(arr, col_pos[:, None], 1),
+                lambda arr, icol: np.take_along_axis(arr, icol[:, None], 1),
                 "i",
-                positions,
+                indices,
                 "ik",
-                col_positions,
+                indices_col,
                 "i",
                 dtype=np.intp,
                 concatenate=True,
