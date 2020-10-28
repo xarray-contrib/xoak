@@ -22,7 +22,10 @@ def dataset(request, array_lib):
     lon = xr.DataArray(array_lib.random.uniform(-180, 180, size=shape))
     field = lat + lon  # artificial data of the same shape as lon and lat
 
-    ds = xr.Dataset(coords={"lat": lat, "lon": lon}, data_vars={"field": field},)
+    ds = xr.Dataset(
+        coords={"lat": lat, "lon": lon},
+        data_vars={"field": field},
+    )
 
     return ds
 

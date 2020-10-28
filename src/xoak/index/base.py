@@ -5,11 +5,10 @@ import warnings
 import numpy as np
 
 
-Index = TypeVar('Index')
+Index = TypeVar("Index")
 
 
 class IndexAdapter(abc.ABC):
-
     def __init__(self, **kwargs):
         pass
 
@@ -27,7 +26,6 @@ class IndexRegistrationWarning(Warning):
 
 
 class IndexRegistry(Mapping[str, IndexAdapter]):
-
     def __init__(self):
         self._indexes = {}
 
@@ -62,7 +60,6 @@ indexes = IndexRegistry()
 
 
 def register_index(name):
-
     def decorator(cls):
         indexes.register(name, cls)
         return cls
@@ -85,14 +82,17 @@ def normalize_index(name_or_cls: Union[str, Any]) -> Type[IndexAdapter]:
 
 class XoakIndexWrapper:
 
-    _query_result_dtype: List[Tuple[str, Any]] = [("distances", np.double), ("positions", np.intp)]
+    _query_result_dtype: List[Tuple[str, Any]] = [
+        ("distances", np.double),
+        ("positions", np.intp),
+    ]
 
     def __init__(
-            self,
-            index_adapter: Union[str, Type[IndexAdapter]],
-            points: np.ndarray,
-            offset: int,
-            **kwargs
+        self,
+        index_adapter: Union[str, Type[IndexAdapter]],
+        points: np.ndarray,
+        offset: int,
+        **kwargs,
     ):
         index_adapter_cls = normalize_index(index_adapter)
 

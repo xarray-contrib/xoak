@@ -52,8 +52,9 @@ IndexType = Union[str, Type[IndexAdapter]]
 class XoakAccessor:
     """A xarray Dataset or DataArray extension for indexing irregular,
     n-dimensional data using a ball tree.
-    
+
     """
+
     _index: IndexAttr
     _index_type: IndexType
     _index_coords: Tuple[str]
@@ -71,7 +72,9 @@ class XoakAccessor:
 
         for i, chunk in enumerate(X.to_delayed().ravel()):
             indexes.append(
-                dask.delayed(XoakIndexWrapper)(self._index_type, chunk, offset, **kwargs)
+                dask.delayed(XoakIndexWrapper)(
+                    self._index_type, chunk, offset, **kwargs
+                )
             )
             offset += X.chunks[0][i]
 
@@ -81,17 +84,17 @@ class XoakAccessor:
             return tuple(indexes)
 
     def set_index(
-            self,
-            coords: Iterable[str],
-            index_type: IndexType,
-            persist: bool = True,
-            **kwargs
+        self,
+        coords: Iterable[str],
+        index_type: IndexType,
+        persist: bool = True,
+        **kwargs
     ):
         """Create an index tree from a subset of coordinates of the DataArray / Dataset.
 
         If the given coordinates are chunked (Dask arrays), this method will (lazily) create
         a forest of index trees (one tree per chunk of the flattened coordinate arrays).
-        
+
         Parameters
         ----------
         coords : iterable
@@ -137,6 +140,7 @@ class XoakAccessor:
             return self._index.index
         else:
             import dask
+
             index_wrappers = dask.compute(*self._index)
             return [wrp.index for wrp in index_wrappers]
 
@@ -177,7 +181,9 @@ class XoakAccessor:
                 for idx in indexes:
                     dlyd = dask.delayed(idx.query)(chunk)
                     res_chunk_idx.append(
-                        da.from_delayed(dlyd, shape, dtype=XoakIndexWrapper._query_result_dtype)
+                        da.from_delayed(
+                            dlyd, shape, dtype=XoakIndexWrapper._query_result_dtype
+                        )
                     )
 
                 res_chunk.append(da.concatenate(res_chunk_idx, axis=1))
@@ -193,13 +199,13 @@ class XoakAccessor:
 
             results = da.blockwise(
                 lambda arr, col_pos: np.take_along_axis(arr, col_pos[:, None], 1),
-                'i',
+                "i",
                 positions,
-                'ik',
+                "ik",
                 col_positions,
-                'i',
+                "i",
                 dtype=np.intp,
-                concatenate=True
+                concatenate=True,
             )
 
         return results
@@ -207,11 +213,11 @@ class XoakAccessor:
     def _get_pos_indexers(self, indices, indexers, compute=False):
         """Returns positional indexers based on the query results and the
         original (label-based) indexers.
-        
+
         1. Unravel the (flattened) indices returned from the query
         2. Reshape the unraveled indices according to indexers shapes
         3. Wrap the indices in xarray.Variable objects.
-        
+
         """
         pos_indexers = {}
 
@@ -234,17 +240,15 @@ class XoakAccessor:
         return pos_indexers
 
     def sel(
-        self,
-        indexers: Mapping[Hashable, Any] = None,
-        **indexers_kwargs: Any
+        self, indexers: Mapping[Hashable, Any] = None, **indexers_kwargs: Any
     ) -> Union[xr.Dataset, xr.DataArray]:
         """Selection based on a ball tree index.
-        
+
         The index must have been already built using `xoak.set_index()`.
-        
+
         It behaves mostly like :meth:`xarray.Dataset.sel` and
         :meth:`xarray.DataArray.sel` methods, with some limitations:
-        
+
         - Orthogonal indexing is not supported
         - For vectorized (point-wise) indexing, you need to supply xarray
           objects
@@ -253,7 +257,7 @@ class XoakAccessor:
 
         This triggers :func:`dask.compute` if the given indexers and/or the index
         coordinates are chunked.
-        
+
         """
         if self._index is None:
             raise ValueError(
