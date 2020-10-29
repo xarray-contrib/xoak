@@ -1,10 +1,7 @@
-import numpy as np
 import dask
-import xarray as xr
-
-import xoak
-
+import numpy as np
 import pytest
+import xarray as xr
 
 
 @pytest.fixture(params=[np, dask.array])
@@ -13,8 +10,8 @@ def array_lib(request):
     return request.param
 
 
-@pytest.fixture(params=[(100, 100), (10, 1), (10_000,), (36, 18, 12)])
-def dataset(request, array_lib):
+@pytest.fixture(params=[(10, 10), (10, 1), (1000,), (3, 10, 5)])
+def geo_dataset(request, array_lib):
     """Dataset with coords lon and lat on a grid of different shapes."""
     shape = request.param
 
@@ -31,7 +28,7 @@ def dataset(request, array_lib):
 
 
 @pytest.fixture(params=[(10,), (33, 69), (1_000,), (1, 2, 3, 4)])
-def indexer(request, array_lib):
+def geo_indexer(request, array_lib):
     """Indexer dataset with coords longitude and latitude of parametrized shapes."""
     shape = request.param
 
@@ -41,15 +38,3 @@ def indexer(request, array_lib):
     ds = xr.Dataset(coords={"longitude": longitude, "latitude": latitude})
 
     return ds
-
-
-def test_indexer(dataset, indexer):
-    """Select the dataset with positions from the indexer."""
-    # create index
-    dataset.xoak.set_index(["lat", "lon"], "geo_balltree")
-
-    # select with indexer
-    ds_sel = dataset.xoak.sel(lat=indexer.latitude, lon=indexer.longitude)
-
-    # ensure same shape
-    assert ds_sel.field.shape == indexer.longitude.shape
