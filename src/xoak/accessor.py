@@ -210,7 +210,7 @@ class XoakAccessor:
 
         return results
 
-    def _get_pos_indexers(self, indices, indexers, compute=False):
+    def _get_pos_indexers(self, indices, indexers):
         """Returns positional indexers based on the query results and the
         original (label-based) indexers.
 
@@ -227,14 +227,11 @@ class XoakAccessor:
         if len(set(indexer_dims)) > 1:
             raise ValueError("All indexers must have the same dimensions.")
 
-        if compute and not isinstance(indices, np.ndarray):
-            indices = indices.compute()
-
         u_indices = list(np.unravel_index(indices.ravel(), self._index_coords_shape))
 
         for dim, ind in zip(self._index_coords_dims, u_indices):
             pos_indexers[dim] = xr.Variable(
-                indexer_dims[0], ind.reshape(indexer_shapes[0])
+                indexer_dims[0], ind.reshape(indexer_shapes[0]),
             )
 
         return pos_indexers
@@ -266,8 +263,16 @@ class XoakAccessor:
 
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "xoak.sel")
         indices = self._query(indexers)
-        pos_indexers = self._get_pos_indexers(indices, indexers, compute=True)
 
+        if not isinstance(indices, np.ndarray):
+            # TODO: remove (see todo below)
+            indices = indices.compute()
+
+        pos_indexers = self._get_pos_indexers(indices, indexers)
+
+        # TODO: issue in xarray. 1-dimensional xarray.Variables are always considered
+        # as OuterIndexer, while we want here VectorizedIndexer
+        # This would also allow lazy selection
         result = self._xarray_obj.isel(indexers=pos_indexers)
 
         return result
