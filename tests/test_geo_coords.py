@@ -43,12 +43,10 @@ def indexer(request, array_lib):
     return ds
 
 
-def test_indexer(dataset, indexer, array_lib):
+def test_indexer(dataset, indexer):
     """Select the dataset with positions from the indexer."""
     # create index
-    dataset.xoak.set_index(
-        ["lat", "lon"], transform=array_lib.deg2rad, metric="haversine"
-    )
+    dataset.xoak.set_index(["lat", "lon"], "geo_balltree")
 
     # select with indexer
     ds_sel = dataset.xoak.sel(lat=indexer.latitude, lon=indexer.longitude)

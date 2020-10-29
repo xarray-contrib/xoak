@@ -105,7 +105,7 @@ class IndexRegistry(Mapping[str, IndexAdapter]):
         return self._indexes[key]
 
     def __iter__(self):
-        return len(self._indexes)
+        return iter(self._indexes)
 
     def __len__(self):
         return len(self._indexes)
