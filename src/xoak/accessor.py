@@ -231,7 +231,8 @@ class XoakAccessor:
 
         for dim, ind in zip(self._index_coords_dims, u_indices):
             pos_indexers[dim] = xr.Variable(
-                indexer_dims[0], ind.reshape(indexer_shapes[0]),
+                indexer_dims[0],
+                ind.reshape(indexer_shapes[0]),
             )
 
         return pos_indexers
