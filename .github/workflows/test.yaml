@@ -47,3 +47,6 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: pytest . --verbose --color=yes
+      - name: Codecov
+        if: matrix.os == "ubuntu-latest" && matrix.python-version == "3.8"
+        uses: codecov/codecov-action@v1
