@@ -1,11 +1,10 @@
 import abc
-from typing import Any, List, Mapping, Tuple, Type, TypeVar, Union
 import warnings
+from typing import Any, List, Mapping, Tuple, Type, TypeVar, Union
 
 import numpy as np
 
-
-Index = TypeVar("Index")
+Index = TypeVar('Index')
 
 
 class IndexAdapter(abc.ABC):
@@ -90,7 +89,7 @@ class IndexRegistry(Mapping[str, IndexAdapter]):
 
         """
         if not issubclass(cls, IndexAdapter):
-            raise TypeError("can only register IndexAdapter subclasses.")
+            raise TypeError('can only register IndexAdapter subclasses.')
 
         if name in self._indexes:
             warnings.warn(
@@ -111,8 +110,8 @@ class IndexRegistry(Mapping[str, IndexAdapter]):
         return len(self._indexes)
 
     def __repr__(self):
-        header = f"<IndexRegistry ({len(self._indexes)} indexes)>\n"
-        return header + "\n".join([name for name in self._indexes])
+        header = f'<IndexRegistry ({len(self._indexes)} indexes)>\n'
+        return header + '\n'.join([name for name in self._indexes])
 
 
 indexes = IndexRegistry()
@@ -151,8 +150,8 @@ class XoakIndexWrapper:
     """
 
     _query_result_dtype: List[Tuple[str, Any]] = [
-        ("distances", np.double),
-        ("indices", np.intp),
+        ('distances', np.double),
+        ('indices', np.intp),
     ]
 
     def __init__(
@@ -176,7 +175,7 @@ class XoakIndexWrapper:
         distances, positions = self._index_adapter.query(self._index, points)
 
         result = np.empty(shape=points.shape[0], dtype=self._query_result_dtype)
-        result["distances"] = distances.ravel().astype(np.double)
-        result["indices"] = positions.ravel().astype(np.intp) + self._offset
+        result['distances'] = distances.ravel().astype(np.double)
+        result['indices'] = positions.ravel().astype(np.intp) + self._offset
 
         return result[:, None]
