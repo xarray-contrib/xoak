@@ -1,34 +1,49 @@
-name: Test
+name: test
 
 on:
-  pull_request:
-    branches: master
   push:
-    branches: master
+    branches:
+    - 'main'
+  pull_request:
+    branches:
+    - 'main'
 
 jobs:
-  Testing:
-    runs-on: ubuntu-latest
+  test:
+    name: pytest (${{ matrix.os }}, ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        python-version: [3.6, 3.7, 3.8]
       fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        python-version: ["3.6", "3.7", "3.8"]
     steps:
-      - uses: actions/checkout@v2 # https://github.com/actions/checkout
-        with:
-          lfs: true
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1 # https://github.com/actions/setup-python
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install miniconda
+        uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
+          auto-activate-base: false
+      - name: Conda info
+        shell: bash -l {0}
         run: |
-          pip install poetry
-      - name: Set up env
+          conda info
+          conda list
+          conda config --show-sources
+          conda config --show
+          printenv | sort
+      - name: Install dependencies
+        shell: bash -l {0}
+        run: mamba install xarray dask numpy scikit-learn pytest pytest-cov
+      - name: Build and install xoak
+        shell: bash -l {0}
         run: |
-          poetry install
-      - name: Lint
-        run: poetry run black --check .
-      - name: Test
-        run: |
-          poetry run pytest
+          python -m pip install . --no-deps -vv --ignore-installed --no-cache-dir
+          python -OO -c "import xoak"
+      - name: Run tests
+        shell: bash -l {0}
+        run: pytest . --verbose --color=yes
