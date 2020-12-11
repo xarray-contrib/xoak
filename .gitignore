@@ -2,6 +2,9 @@
 .vscode
 .DS_Store
 
+# doc
+doc/_api_generated/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
