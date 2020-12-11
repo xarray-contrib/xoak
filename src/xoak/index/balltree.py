@@ -4,7 +4,7 @@ from sklearn.neighbors import BallTree
 from .base import IndexAdapter, register_index
 
 
-@register_index("balltree")
+@register_index('balltree')
 class BallTreeAdapter(IndexAdapter):
     def __init__(self, **kwargs):
         self.index_options = kwargs
@@ -16,10 +16,10 @@ class BallTreeAdapter(IndexAdapter):
         return btree.query(points)
 
 
-@register_index("geo_balltree")
+@register_index('geo_balltree')
 class GeoBallTreeAdapter(IndexAdapter):
     def __init__(self, **kwargs):
-        kwargs.update({"metric": "haversine"})
+        kwargs.update({'metric': 'haversine'})
         self._index_options = kwargs
 
     def build(self, points):

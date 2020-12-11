@@ -103,20 +103,20 @@ ds.xoak.set_index(coord_list, index_type='kdtree', transform=None, **index_kwarg
 - ``coord_list`` is a list of dataset coordinates used to build the index. Those
   coordinates can be either 1-dimensional or n-dimensional. All coordinates
   given here must have the same dimensions.
-  
+
 - ``index_type`` (str) is the type of index used. This could also accept classes
   if we want to allow extending xoak.
-  
+
 - ``tranform`` (callable) is optional and would allow some transformation
   applied to the coordinate labels before building (and querying) the index. For
   example, that could be converting lat/lon coordinates from degrees to radians
   (as input to the haversine formula) or from spherical to cartesian XYZ
   coordinates (for using it with k-d trees, similarly to the trick used in
   ``libpysal``'s Arc_KDTree).
-  
+
 - ``**index_kwargs`` are keyword arguments passed to the underlying tree index
   Python classes (e.g., for setting the metric, the tree leaf size, etc.).
-  
+
 #### Access to the underlying index
 
 ```python
@@ -138,7 +138,7 @@ rules](http://xarray.pydata.org/en/stable/indexing.html) defined in xarray:
 
 - Advanced indexer types such as xarray DataArray or Variable objects should be
   used for point-wise indexing (nearest neighbor lookup).
-  
+
 Additionally:
 
 - For point-wise indexing, indexers must be given for all coordinates in the

@@ -20,8 +20,8 @@ def geo_dataset(request, array_lib):
     field = lat + lon  # artificial data of the same shape as lon and lat
 
     ds = xr.Dataset(
-        coords={"lat": lat, "lon": lon},
-        data_vars={"field": field},
+        coords={'lat': lat, 'lon': lon},
+        data_vars={'field': field},
     )
 
     return ds
@@ -35,6 +35,6 @@ def geo_indexer(request, array_lib):
     latitude = xr.DataArray(array_lib.random.uniform(-90, 90, size=shape))
     longitude = xr.DataArray(array_lib.random.uniform(-180, 180, size=shape))
 
-    ds = xr.Dataset(coords={"longitude": longitude, "latitude": latitude})
+    ds = xr.Dataset(coords={'longitude': longitude, 'latitude': latitude})
 
     return ds

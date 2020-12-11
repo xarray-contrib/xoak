@@ -47,42 +47,40 @@ def test_index_adapter_base():
 
 def test_index_registery():
     registery = IndexRegistry()
-    registery.register("dummy", DummyIndexAdapter)
+    registery.register('dummy', DummyIndexAdapter)
 
-    assert registery["dummy"] is DummyIndexAdapter
-    assert list(registery) == ["dummy"]
+    assert registery['dummy'] is DummyIndexAdapter
+    assert list(registery) == ['dummy']
     assert len(registery) == 1
-    assert repr(registery) == "<IndexRegistry (1 indexes)>\ndummy"
+    assert repr(registery) == '<IndexRegistry (1 indexes)>\ndummy'
 
-    with pytest.warns(
-        IndexRegistrationWarning, match="overriding an already registered index.*"
-    ):
-        registery.register("dummy", DummyIndexAdapter)
+    with pytest.warns(IndexRegistrationWarning, match='overriding an already registered index.*'):
+        registery.register('dummy', DummyIndexAdapter)
 
-    with pytest.raises(TypeError, match="can only register IndexAdapter subclasses."):
-        registery.register("invalid", DummyIndex)
+    with pytest.raises(TypeError, match='can only register IndexAdapter subclasses.'):
+        registery.register('invalid', DummyIndex)
 
 
 def test_register_index():
-    @register_index("test")
+    @register_index('test')
     class TestIndexAdapter(DummyIndexAdapter):
         pass
 
-    assert indexes["test"] is TestIndexAdapter
+    assert indexes['test'] is TestIndexAdapter
 
     indexes._indexes.clear()
 
 
 def test_xoak_index_wrapper():
-    indexes.register("dummy", DummyIndexAdapter)
+    indexes.register('dummy', DummyIndexAdapter)
 
     idx_points = np.zeros((10, 2))
     offset = 1
 
     wrapper = XoakIndexWrapper(DummyIndexAdapter, idx_points, offset, option=2)
-    wrapper2 = XoakIndexWrapper("dummy", idx_points, 0)
+    wrapper2 = XoakIndexWrapper('dummy', idx_points, 0)
 
-    with pytest.raises(TypeError, match=".*is not a subclass of IndexAdapter"):
+    with pytest.raises(TypeError, match='.*is not a subclass of IndexAdapter'):
         XoakIndexWrapper(DummyIndex, idx_points, offset)
 
     assert isinstance(wrapper.index, DummyIndex)
@@ -92,9 +90,9 @@ def test_xoak_index_wrapper():
 
     results = wrapper.query(np.zeros((5, 2))).ravel()
 
-    assert results["distances"].dtype == np.double
-    assert results["indices"].dtype == np.intp
-    np.testing.assert_equal(results["distances"], np.zeros(5))
-    np.testing.assert_equal(results["indices"], np.ones(5) + offset)
+    assert results['distances'].dtype == np.double
+    assert results['indices'].dtype == np.intp
+    np.testing.assert_equal(results['distances'], np.zeros(5))
+    np.testing.assert_equal(results['indices'], np.ones(5) + offset)
 
     indexes._indexes.clear()
