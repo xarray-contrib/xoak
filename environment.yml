@@ -1,0 +1,19 @@
+name: xoak
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - numpy
+  - pandas
+  - dask
+  - dask-labextension
+  - xarray
+  - scikit-learn
+  - jupyter
+  - jupyterlab
+  - notebook
+  - ipykernel
+  - matplotlib
+  - pip
+  - pip:
+      - git+https://github.com/ESM-VFC/xoak
