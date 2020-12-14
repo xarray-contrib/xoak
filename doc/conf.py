@@ -41,6 +41,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.extlinks',
     'sphinx_autosummary_accessors',
+    'nbsphinx',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -83,6 +84,29 @@ html_context = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+
+# Enable notebook execution
+# https://nbsphinx.readthedocs.io/en/0.4.2/never-execute.html
+# nbsphinx_execute = 'auto'
+# Allow errors in all notebooks by
+# nbsphinx_allow_errors = True
+nbsphinx_kernel_name = 'python3'
+
+# Disable cell timeout
+nbsphinx_timeout = -1
+
+nbsphinx_prolog = """
+{% set docname = env.doc2path(env.docname, base=None) %}
+
+|Binder|
+
+You can run this notebook in a `live session <https://mybinder.org/v2/gh/ESM-VFC/xoak/master?filepath=doc/{{
+docname }}>`_ or view it `on Github <https://github.com/ESM-VFC/xoak/blob/master/doc/{{ docname }}>`_.
+
+.. |Binder| image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/ESM-VFC/xoak/master?filepath=doc/{{ docname }}
+"""
 
 
 intersphinx_mapping = {

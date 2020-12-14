@@ -9,6 +9,7 @@ Table of contents
 
 **Help & Reference**
 
+* :doc:`examples/index`
 * :doc:`api`
 * :doc:`release_notes`
 
@@ -17,6 +18,7 @@ Table of contents
    :hidden:
    :caption: Help & Reference
 
+   examples/index
    api
    release_notes
 
