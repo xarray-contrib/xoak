@@ -16,7 +16,7 @@ properties listed below. Proper use of this accessor should be like:
 .. code-block:: python
 
    >>> import xarray as xr         # first import xarray
-   >>> import xsimlab              # import xoak (the 'xoak' accessor is registered)
+   >>> import xoak                 # import xoak (the 'xoak' accessor is registered)
    >>> ds = xr.Dataset()           # create or load an xarray Dataset
    >>> ds.xoak.<meth_or_prop>      # access to the methods and properties listed below
 
@@ -58,3 +58,15 @@ The accessor above is also registered for :py:class:`xarray.DataArray`.
 
     DataArray.xoak.set_index
     DataArray.xoak.sel
+
+Indexes
+-------
+
+.. currentmodule:: xoak
+
+.. autosummary::
+   :toctree: _api_generated/
+
+    indexes
+    register_index
+    IndexAdapter
