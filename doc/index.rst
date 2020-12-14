@@ -1,19 +1,40 @@
-.. xoak documentation master file, created by
-   sphinx-quickstart on Sat Jun 27 18:33:51 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Xoak: xarray extension for indexing irregular grids
+===================================================
 
-Welcome to xoak's documentation!
-================================
+**Xoak** is an Xarray extension that provides specific indexes for selecting
+irregular, n-dimensional data.
+
+Table of contents
+-----------------
+
+**Help & Reference**
+
+* :doc:`examples/index`
+* :doc:`api`
+* :doc:`release_notes`
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :hidden:
+   :caption: Help & Reference
 
+   examples/index
+   api
+   release_notes
 
+**For Contributors**
+
+* :doc:`contribute`
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: For Contributors
+
+   contribute
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

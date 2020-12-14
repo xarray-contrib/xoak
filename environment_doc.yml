@@ -1,0 +1,21 @@
+name: xoak
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - numpy
+  - pandas
+  - dask
+  - xarray
+  - scikit-learn
+  - ipykernel
+  - notebook
+  - ipykernel
+  - matplotlib
+  - sphinx
+  - sphinx-autosummary-accessors
+  - sphinx_rtd_theme
+  - nbsphinx
+  - pip
+  - pip:
+      - git+https://github.com/ESM-VFC/xoak
