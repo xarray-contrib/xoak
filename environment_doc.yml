@@ -3,14 +3,14 @@ channels:
   - conda-forge
 dependencies:
   - python=3.8
-  - numpy=1.19
+  - numpy
   - scikit-learn
   - matplotlib
-  - pip
+  - pip=20.3.1
   - pip:
       - ipykernel
       - dask
-      - xarray=0.16.2
+      - xarray
       - sphinx
       - sphinx-autosummary-accessors
       - sphinx_rtd_theme
