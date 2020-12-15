@@ -1,6 +1,6 @@
 import abc
 import warnings
-from typing import Any, List, Mapping, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, Mapping, Tuple, Type, TypeVar, Union
 
 import numpy as np
 
@@ -68,16 +68,30 @@ class IndexRegistrationWarning(Warning):
     """Warning for conflicts in index registration."""
 
 
-class IndexRegistry(Mapping[str, IndexAdapter]):
-    """Mapping of all indexes that can be used to select data
+class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
+    """A registry of all indexes adapters that can be used to select data
     with xoak.
 
     """
 
-    def __init__(self):
+    _default_indexes: Dict[str, Type[IndexAdapter]] = {}
+
+    def __init__(self, use_default=True):
+        """Creates a new index registry.
+
+        Parameters
+        ----------
+        use_default : bool, optional
+            If True (default), pre-populates the registry with xoak's built-in
+            index adapters.
+
+        """
         self._indexes = {}
 
-    def register(self, name: str, cls: Type[IndexAdapter]):
+        if use_default:
+            self._indexes.update(self._default_indexes)
+
+    def register(self, name: str):
         """Register custom index in xoak.
 
         Parameters
@@ -88,17 +102,23 @@ class IndexRegistry(Mapping[str, IndexAdapter]):
             The index adapter class to register.
 
         """
-        if not issubclass(cls, IndexAdapter):
-            raise TypeError('can only register IndexAdapter subclasses.')
 
-        if name in self._indexes:
-            warnings.warn(
-                f"overriding an already registered index with the name '{name}'.",
-                IndexRegistrationWarning,
-                stacklevel=2,
-            )
+        def wrap(cls: Type[IndexAdapter]):
+            if not issubclass(cls, IndexAdapter):
+                raise TypeError('can only register IndexAdapter subclasses.')
 
-        self._indexes[name] = cls
+            if name in self._indexes:
+                warnings.warn(
+                    f"overriding an already registered index with the name '{name}'.",
+                    IndexRegistrationWarning,
+                    stacklevel=2,
+                )
+
+            self._indexes[name] = cls
+
+            return cls
+
+        return wrap
 
     def __getitem__(self, key):
         return self._indexes[key]
@@ -114,17 +134,11 @@ class IndexRegistry(Mapping[str, IndexAdapter]):
         return header + '\n'.join([name for name in self._indexes])
 
 
-indexes = IndexRegistry()
+def register_default(name: str):
+    """A convenient decorator to register xoak's builtin indexes."""
 
-
-def register_index(name):
-    """A convenient decorator that can be applied to any
-    :class:`~xoak.IndexAdapter` class to register a custom index in xoak.
-
-    """
-
-    def decorator(cls):
-        indexes.register(name, cls)
+    def decorator(cls: Type[IndexAdapter]):
+        IndexRegistry._default_indexes[name] = cls
         return cls
 
     return decorator
@@ -133,7 +147,7 @@ def register_index(name):
 def normalize_index(name_or_cls: Union[str, Any]) -> Type[IndexAdapter]:
 
     if isinstance(name_or_cls, str):
-        cls = indexes[name_or_cls]
+        cls = IndexRegistry._default_indexes[name_or_cls]
     else:
         cls = name_or_cls
 

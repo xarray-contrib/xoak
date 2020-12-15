@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.neighbors import BallTree
 
-from .base import IndexAdapter, register_index
+from .base import IndexAdapter, register_default
 
 
-@register_index('balltree')
+@register_default('balltree')
 class BallTreeAdapter(IndexAdapter):
     def __init__(self, **kwargs):
         self.index_options = kwargs
@@ -16,7 +16,7 @@ class BallTreeAdapter(IndexAdapter):
         return btree.query(points)
 
 
-@register_index('geo_balltree')
+@register_default('geo_balltree')
 class GeoBallTreeAdapter(IndexAdapter):
     def __init__(self, **kwargs):
         kwargs.update({'metric': 'haversine'})
