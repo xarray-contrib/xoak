@@ -1,6 +1,9 @@
+import pytest
 import xarray as xr
 
 import xoak  # noqa:F401
+
+pytest.importorskip('sklearn')
 
 
 def test_geo_balltree(geo_dataset, geo_indexer, geo_expected):

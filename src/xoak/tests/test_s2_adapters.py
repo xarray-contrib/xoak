@@ -1,6 +1,9 @@
+import pytest
 import xarray as xr
 
 import xoak  # noqa:F401
+
+pytest.importorskip('pys2index')
 
 
 def test_s2point(geo_dataset, geo_indexer, geo_expected):
