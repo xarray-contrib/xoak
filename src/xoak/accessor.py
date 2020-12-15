@@ -85,8 +85,9 @@ class XoakAccessor:
         coords : iterable
             Coordinate names. Each given coordinate must have the same dimension(s),
             in the same order.
-        index_type : str or :class:`xoak.IndexWrapper` subclass
-            Either one of the registered index types or a custom index wrapper class.
+        index_type : str or :class:`~xoak.IndexAdapter` subclass
+            Either a registered index adapter (see :class:`~xoak.IndexRegistry`) or a custom
+            :class:`~xoak.IndexAdapter` subclass.
         persist: bool
             If True (default), this method will precompute and persist in memory the forest
             of index trees, if any.
