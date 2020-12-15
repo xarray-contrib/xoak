@@ -1,7 +1,7 @@
 from pkg_resources import DistributionNotFound, get_distribution
 
 from .accessor import XoakAccessor
-from .index import IndexAdapter, indexes, register_index
+from .index import IndexAdapter, IndexRegistry
 
 try:
     __version__ = get_distribution(__name__).version

@@ -67,6 +67,5 @@ Indexes
 .. autosummary::
    :toctree: _api_generated/
 
-    indexes
-    register_index
     IndexAdapter
+    IndexRegistry

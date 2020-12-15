@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
 
-from xoak import IndexAdapter, indexes, register_index
-from xoak.index.base import IndexRegistrationWarning, IndexRegistry, XoakIndexWrapper
+from xoak import IndexAdapter, IndexRegistry
+from xoak.index.balltree import BallTreeAdapter
+from xoak.index.base import IndexRegistrationWarning, XoakIndexWrapper, normalize_index
 
 
 class DummyIndex:
@@ -45,43 +46,45 @@ def test_index_adapter_base():
         adapter.query(None, np.zeros((10, 2)))
 
 
-def test_index_registery():
-    registery = IndexRegistry()
-    registery.register('dummy', DummyIndexAdapter)
+def test_index_registery_constructor():
+    registry = IndexRegistry()
+    assert dict(registry) == registry._default_indexes
 
-    assert registery['dummy'] is DummyIndexAdapter
-    assert list(registery) == ['dummy']
-    assert len(registery) == 1
-    assert repr(registery) == '<IndexRegistry (1 indexes)>\ndummy'
+    registry = IndexRegistry(use_default=False)
+    assert len(registry) == 0
+
+
+def test_index_registery_register():
+    registry = IndexRegistry(use_default=False)
+
+    registry.register('dummy')(DummyIndexAdapter)
+
+    assert registry['dummy'] is DummyIndexAdapter
+    assert list(registry) == ['dummy']
+    assert len(registry) == 1
+    assert repr(registry) == '<IndexRegistry (1 indexes)>\ndummy'
 
     with pytest.warns(IndexRegistrationWarning, match='overriding an already registered index.*'):
-        registery.register('dummy', DummyIndexAdapter)
+        registry.register('dummy')(DummyIndexAdapter)
 
     with pytest.raises(TypeError, match='can only register IndexAdapter subclasses.'):
-        registery.register('invalid', DummyIndex)
+        registry.register('invalid')(DummyIndex)
 
 
-def test_register_index():
-    @register_index('test')
-    class TestIndexAdapter(DummyIndexAdapter):
-        pass
+def test_normalize_index():
+    assert normalize_index(DummyIndexAdapter) is DummyIndexAdapter
+    assert normalize_index('balltree') is BallTreeAdapter
 
-    assert indexes['test'] is TestIndexAdapter
-
-    indexes._indexes.clear()
+    with pytest.raises(TypeError, match='.*is not a subclass of IndexAdapter'):
+        normalize_index(DummyIndex)
 
 
 def test_xoak_index_wrapper():
-    indexes.register('dummy', DummyIndexAdapter)
-
     idx_points = np.zeros((10, 2))
     offset = 1
 
     wrapper = XoakIndexWrapper(DummyIndexAdapter, idx_points, offset, option=2)
-    wrapper2 = XoakIndexWrapper('dummy', idx_points, 0)
-
-    with pytest.raises(TypeError, match='.*is not a subclass of IndexAdapter'):
-        XoakIndexWrapper(DummyIndex, idx_points, offset)
+    wrapper2 = XoakIndexWrapper(DummyIndexAdapter, idx_points, 0)
 
     assert isinstance(wrapper.index, DummyIndex)
     assert wrapper.index.option == 2
@@ -94,5 +97,3 @@ def test_xoak_index_wrapper():
     assert results['indices'].dtype == np.intp
     np.testing.assert_equal(results['distances'], np.zeros(5))
     np.testing.assert_equal(results['indices'], np.ones(5) + offset)
-
-    indexes._indexes.clear()

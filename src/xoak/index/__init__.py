@@ -1,4 +1,4 @@
-from .base import IndexAdapter, indexes, register_index
+from .base import IndexAdapter, IndexRegistry
 
 try:
     from .balltree import BallTreeAdapter, GeoBallTreeAdapter
