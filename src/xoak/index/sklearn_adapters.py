@@ -4,7 +4,7 @@ from sklearn.neighbors import BallTree
 from .base import IndexAdapter, register_default
 
 
-@register_default('balltree')
+@register_default('sklearn_balltree')
 class BallTreeAdapter(IndexAdapter):
     def __init__(self, **kwargs):
         self.index_options = kwargs
@@ -16,8 +16,21 @@ class BallTreeAdapter(IndexAdapter):
         return btree.query(points)
 
 
-@register_default('geo_balltree')
+@register_default('sklearn_geo_balltree')
 class GeoBallTreeAdapter(IndexAdapter):
+    """Xoak index adapter for :class:`sklearn.neighbors.BallTree`, using
+    the 'haversine' metric.
+
+    It can be used for indexing a set of latitude / longitude points.
+
+    When building the index, the coordinates must be given in the latitude,
+    longitude order.
+
+    Latitude and longitude values must be given in degrees for both index and
+    query points (those values are converted in radians by this adapter).
+
+    """
+
     def __init__(self, **kwargs):
         kwargs.update({'metric': 'haversine'})
         self._index_options = kwargs
