@@ -3,16 +3,16 @@ channels:
   - conda-forge
 dependencies:
   - python=3.8
-  - numpy
-  - scikit-learn
-  - matplotlib
+  - dask=2.30.0
+  - ipykernel=5.4.2
+  - matplotlib=3.3.3
+  - nbsphinx=0.7.1
+  - numpy=1.19.4
+  - scikit-learn=0.23.2
+  - sphinx=3.3.1
+  - sphinx-autosummary-accessors=0.1.2
+  - sphinx_rtd_theme=0.5.0
+  - xarray=0.16.2
   - pip=20.3.1
   - pip:
-      - ipykernel
-      - dask
-      - xarray
-      - sphinx
-      - sphinx-autosummary-accessors
-      - sphinx_rtd_theme
-      - nbsphinx
       - git+https://github.com/ESM-VFC/xoak
