@@ -5,7 +5,7 @@ from .base import IndexAdapter, register_default
 
 
 @register_default('sklearn_kdtree')
-class KDTreeAdapter(IndexAdapter):
+class SklearnKDTreeAdapter(IndexAdapter):
     """Xoak index adapter for :class:`sklearn.neighbors.KDTree`."""
 
     def __init__(self, **kwargs):
@@ -19,7 +19,7 @@ class KDTreeAdapter(IndexAdapter):
 
 
 @register_default('sklearn_balltree')
-class BallTreeAdapter(IndexAdapter):
+class SklearnBallTreeAdapter(IndexAdapter):
     """Xoak index adapter for :class:`sklearn.neighbors.BallTree`."""
 
     def __init__(self, **kwargs):
@@ -33,7 +33,7 @@ class BallTreeAdapter(IndexAdapter):
 
 
 @register_default('sklearn_geo_balltree')
-class GeoBallTreeAdapter(IndexAdapter):
+class SklearnGeoBallTreeAdapter(IndexAdapter):
     """Xoak index adapter for :class:`sklearn.neighbors.BallTree`, using
     the 'haversine' metric.
 

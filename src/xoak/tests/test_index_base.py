@@ -3,7 +3,7 @@ import pytest
 
 from xoak import IndexAdapter, IndexRegistry
 from xoak.index.base import IndexRegistrationWarning, XoakIndexWrapper, normalize_index
-from xoak.index.sklearn_adapters import BallTreeAdapter
+from xoak.index.sklearn_adapters import SklearnBallTreeAdapter
 
 
 class DummyIndex:
@@ -73,7 +73,7 @@ def test_index_registery_register():
 
 def test_normalize_index():
     assert normalize_index(DummyIndexAdapter) is DummyIndexAdapter
-    assert normalize_index('sklearn_balltree') is BallTreeAdapter
+    assert normalize_index('sklearn_balltree') is SklearnBallTreeAdapter
 
     with pytest.raises(TypeError, match='.*is not a subclass of IndexAdapter'):
         normalize_index(DummyIndex)
