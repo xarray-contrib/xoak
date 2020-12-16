@@ -6,11 +6,13 @@ from .base import IndexAdapter, register_default
 
 @register_default('sklearn_balltree')
 class BallTreeAdapter(IndexAdapter):
+    """Xoak index adapter for :class:`sklearn.neighbors.BallTree`."""
+
     def __init__(self, **kwargs):
-        self.index_options = kwargs
+        self._index_options = kwargs
 
     def build(self, points):
-        return BallTree(points, **self.index_options)
+        return BallTree(points, **self._index_options)
 
     def query(self, btree, points):
         return btree.query(points)
