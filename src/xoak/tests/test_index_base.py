@@ -2,7 +2,12 @@ import numpy as np
 import pytest
 
 from xoak import IndexAdapter, IndexRegistry
-from xoak.index.base import IndexRegistrationWarning, XoakIndexWrapper, normalize_index
+from xoak.index.base import (
+    IndexRegistrationWarning,
+    XoakIndexWrapper,
+    normalize_index,
+    register_default,
+)
 from xoak.index.scipy_adapters import ScipyKDTreeAdapter
 
 
@@ -99,6 +104,10 @@ def test_index_registry_ipython_completion():
 def test_register_default():
     # check that docstrings are updated
     assert 'This index adapter is registered in xoak' in ScipyKDTreeAdapter.__doc__
+
+    register_default('dummy')(DummyIndexAdapter)
+    assert 'This index adapter is registered in xoak' in DummyIndexAdapter.__doc__
+    del IndexRegistry._default_indexes['dummy']
 
 
 def test_normalize_index():
