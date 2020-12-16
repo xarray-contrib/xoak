@@ -1,7 +1,21 @@
 import numpy as np
-from sklearn.neighbors import BallTree
+from sklearn.neighbors import BallTree, KDTree
 
 from .base import IndexAdapter, register_default
+
+
+@register_default('sklearn_kdtree')
+class KDTreeAdapter(IndexAdapter):
+    """Xoak index adapter for :class:`sklearn.neighbors.KDTree`."""
+
+    def __init__(self, **kwargs):
+        self._index_options = kwargs
+
+    def build(self, points):
+        return KDTree(points, **self._index_options)
+
+    def query(self, kdtree, points):
+        return kdtree.query(points)
 
 
 @register_default('sklearn_balltree')
