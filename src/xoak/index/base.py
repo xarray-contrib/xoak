@@ -1,5 +1,6 @@
 import abc
 import warnings
+from contextlib import suppress
 from typing import Any, Dict, List, Mapping, Tuple, Type, TypeVar, Union
 
 import numpy as np
@@ -79,6 +80,9 @@ class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
     def __init__(self, use_default=True):
         """Creates a new index registry.
 
+        This registry provides a dict-like interface as well as attribute-style
+        access to index adapters.
+
         Parameters
         ----------
         use_default : bool, optional
@@ -119,6 +123,30 @@ class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
             return cls
 
         return wrap
+
+    def __getattr__(self, name):
+        if name not in {'__dict__', '__setstate__'}:
+            # this avoids an infinite loop when pickle looks for the
+            # __setstate__ attribute before the xarray object is initialized
+            with suppress(KeyError):
+                return self._indexes[name]
+        raise AttributeError(f'IndexRegistry object has no attribute {name!r}')
+
+    def __setattr__(self, name, value):
+        if name == '_indexes':
+            object.__setattr__(self, name, value)
+        else:
+            raise AttributeError(
+                f'cannot set attribute {name!r} on a IndexRegistry object. '
+                'Use `.register()` to add a new index adapter to the registry.'
+            )
+
+    def __dir__(self):
+        extra_attrs = [k for k in self._indexes]
+        return sorted(set(dir(type(self)) + extra_attrs))
+
+    def _ipython_key_completions_(self):
+        return list(self._indexes)
 
     def __getitem__(self, key):
         return self._indexes[key]
