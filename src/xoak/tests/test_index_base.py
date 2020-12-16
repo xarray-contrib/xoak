@@ -96,6 +96,11 @@ def test_index_registry_ipython_completion():
     assert 'dummy' in registry._ipython_key_completions_()
 
 
+def test_register_default():
+    # check that docstrings are updated
+    assert 'This index adapter is registered in xoak' in ScipyKDTreeAdapter.__doc__
+
+
 def test_normalize_index():
     assert normalize_index(DummyIndexAdapter) is DummyIndexAdapter
     assert normalize_index('scipy_kdtree') is ScipyKDTreeAdapter

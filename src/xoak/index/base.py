@@ -165,7 +165,25 @@ class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
 def register_default(name: str):
     """A convenient decorator to register xoak's builtin indexes."""
 
+    doc_extra = f"""
+
+    This index adapter is registered in xoak under the name ``{name}``.
+    You can use it in :meth:`xarray.Dataset.xoak.set_index` by simply providing
+    its name for the ``index_type`` argument.
+    Alternatively, you can access it via the index registry, i.e.,
+
+    >>> import xoak
+    >>> ireg = xoak.IndexRegistry()
+    >>> ireg.{name}
+
+    """
+
     def decorator(cls: Type[IndexAdapter]):
+        if cls.__doc__ is not None:
+            cls.__doc__ += doc_extra
+        else:
+            cls.__doc__ = doc_extra
+
         IndexRegistry._default_indexes[name] = cls
         return cls
 
