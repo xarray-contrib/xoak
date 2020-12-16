@@ -3,6 +3,7 @@ import importlib
 from .base import IndexAdapter, IndexRegistry  # noqa: F401
 
 adapters = [
+    'scipy_adapters',
     'sklearn_adapters',
     's2_adapters',
 ]
