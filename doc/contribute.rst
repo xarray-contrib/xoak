@@ -64,7 +64,7 @@ To install the dependencies, we recommend using the conda_ package manager with
 the conda-forge_ channel. For development purpose, you might consider installing
 the packages in a new conda environment::
 
-  $ conda create -n xoak_dev python xarray dask scikit-learn -c conda-forge
+  $ conda create -n xoak_dev python xarray dask scipy scikit-learn -c conda-forge
   $ conda activate xoak_dev
 
 Then install Xoak locally (in development mode) using ``pip``::

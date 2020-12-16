@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 
 from xoak import IndexAdapter, IndexRegistry
-from xoak.index.balltree import BallTreeAdapter
 from xoak.index.base import IndexRegistrationWarning, XoakIndexWrapper, normalize_index
+from xoak.index.scipy_adapters import ScipyKDTreeAdapter
 
 
 class DummyIndex:
@@ -56,13 +56,7 @@ def test_index_registery_constructor():
 
 def test_index_registery_register():
     registry = IndexRegistry(use_default=False)
-
     registry.register('dummy')(DummyIndexAdapter)
-
-    assert registry['dummy'] is DummyIndexAdapter
-    assert list(registry) == ['dummy']
-    assert len(registry) == 1
-    assert repr(registry) == '<IndexRegistry (1 indexes)>\ndummy'
 
     with pytest.warns(IndexRegistrationWarning, match='overriding an already registered index.*'):
         registry.register('dummy')(DummyIndexAdapter)
@@ -71,9 +65,45 @@ def test_index_registery_register():
         registry.register('invalid')(DummyIndex)
 
 
+def test_index_registry_dict_interface():
+    registry = IndexRegistry(use_default=False)
+    registry.register('dummy')(DummyIndexAdapter)
+
+    assert registry['dummy'] is DummyIndexAdapter
+    assert list(registry) == ['dummy']
+    assert len(registry) == 1
+    assert repr(registry) == '<IndexRegistry (1 indexes)>\ndummy'
+
+
+def test_index_registry_attr_access():
+    registry = IndexRegistry(use_default=False)
+    registry.register('dummy')(DummyIndexAdapter)
+
+    assert registry.dummy is DummyIndexAdapter
+    assert 'dummy' in dir(registry)
+
+    with pytest.raises(AttributeError, match='.*has no attribute.*'):
+        registry.invalid_attr
+
+    with pytest.raises(AttributeError, match='.*cannot set attribute.*'):
+        registry.custom = DummyIndexAdapter
+
+
+def test_index_registry_ipython_completion():
+    registry = IndexRegistry(use_default=False)
+    registry.register('dummy')(DummyIndexAdapter)
+
+    assert 'dummy' in registry._ipython_key_completions_()
+
+
+def test_register_default():
+    # check that docstrings are updated
+    assert 'This index adapter is registered in xoak' in ScipyKDTreeAdapter.__doc__
+
+
 def test_normalize_index():
     assert normalize_index(DummyIndexAdapter) is DummyIndexAdapter
-    assert normalize_index('balltree') is BallTreeAdapter
+    assert normalize_index('scipy_kdtree') is ScipyKDTreeAdapter
 
     with pytest.raises(TypeError, match='.*is not a subclass of IndexAdapter'):
         normalize_index(DummyIndex)
