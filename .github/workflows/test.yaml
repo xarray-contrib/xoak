@@ -42,7 +42,8 @@ jobs:
       - name: Build and install xoak
         shell: bash -l {0}
         run: |
-          python -m pip install . --no-deps -vv --ignore-installed --no-cache-dir
+          python -m pip install . --no-deps -v
+          python -OO -c "import xoak"
       - name: Run tests
         shell: bash -l {0}
         run: pytest . --verbose --color=yes
