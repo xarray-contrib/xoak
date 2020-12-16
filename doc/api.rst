@@ -69,3 +69,28 @@ Indexes
 
     IndexAdapter
     IndexRegistry
+
+**Xoak's built-in index adapters**
+
+.. currentmodule:: xoak.index.scipy_adapters
+
+.. autosummary::
+   :toctree: _api_generated/
+
+    ScipyKDTreeAdapter
+
+.. currentmodule:: xoak.index.sklearn_adapters
+
+.. autosummary::
+   :toctree: _api_generated/
+
+    SklearnKDTreeAdapter
+    SklearnBallTreeAdapter
+    SklearnGeoBallTreeAdapter
+
+.. currentmodule:: xoak.index.s2_adapters
+
+.. autosummary::
+   :toctree: _api_generated/
+
+    S2PointIndexAdapter

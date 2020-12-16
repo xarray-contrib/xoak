@@ -111,6 +111,8 @@ docname }}>`_ or view it `on Github <https://github.com/ESM-VFC/xoak/blob/master
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+    'sklearn': ('http://scikit-learn.org/stable', None),
     'xarray': ('http://xarray.pydata.org/en/stable/', None),
 }
 
