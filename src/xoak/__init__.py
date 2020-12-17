@@ -5,6 +5,6 @@ from .index import IndexAdapter, IndexRegistry
 
 try:
     __version__ = get_distribution(__name__).version
-except DistributionNotFound:  # noqa: F401; pragma: no cover
+except DistributionNotFound:  # pragma: no cover
     # package is not installed
     pass

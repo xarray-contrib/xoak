@@ -12,7 +12,7 @@ for mod in adapters:
     try:
         # importing the module registers the adapters
         importlib.import_module('.' + mod, package='xoak.index')
-    except ImportError:
+    except ImportError:  # pragma: no cover
         pass
 
 del adapters

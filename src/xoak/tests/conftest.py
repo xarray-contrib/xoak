@@ -11,8 +11,14 @@ dask.config.set(scheduler='single-threaded')
 
 
 @pytest.fixture(params=[np, dask.array], scope='session')
-def array_lib(request):
-    """Array lib that is used for creation of the data and the indexer."""
+def dataset_array_lib(request):
+    """Array lib that is used for creation of the data."""
+    return request.param
+
+
+@pytest.fixture(params=[np, dask.array], scope='session')
+def indexer_array_lib(request):
+    """Array lib that is used for creation of the indexer."""
     return request.param
 
 
@@ -59,12 +65,12 @@ def query_brute_force(dataset, dataset_dims_shape, indexer, indexer_dims_shape, 
 
 
 @pytest.fixture(scope='session')
-def geo_dataset(dataset_dims_shape, array_lib):
+def geo_dataset(dataset_dims_shape, dataset_array_lib):
     """Dataset with coords lon and lat on a grid of different shapes."""
     dims, shape = dataset_dims_shape
 
-    lat = xr.DataArray(array_lib.random.uniform(-80, 80, size=shape), dims=dims)
-    lon = xr.DataArray(array_lib.random.uniform(-160, 160, size=shape), dims=dims)
+    lat = xr.DataArray(dataset_array_lib.random.uniform(-80, 80, size=shape), dims=dims)
+    lon = xr.DataArray(dataset_array_lib.random.uniform(-160, 160, size=shape), dims=dims)
 
     ds = xr.Dataset(coords={'lat': lat, 'lon': lon})
 
@@ -72,12 +78,12 @@ def geo_dataset(dataset_dims_shape, array_lib):
 
 
 @pytest.fixture(scope='session')
-def geo_indexer(indexer_dims_shape, array_lib):
+def geo_indexer(indexer_dims_shape, indexer_array_lib):
     """Indexer dataset with coords longitude and latitude of parametrized shapes."""
     dims, shape = indexer_dims_shape
 
-    latitude = xr.DataArray(array_lib.random.uniform(-80, 80, size=shape), dims=dims)
-    longitude = xr.DataArray(array_lib.random.uniform(-160, 160, size=shape), dims=dims)
+    latitude = xr.DataArray(indexer_array_lib.random.uniform(-80, 80, size=shape), dims=dims)
+    longitude = xr.DataArray(indexer_array_lib.random.uniform(-160, 160, size=shape), dims=dims)
 
     ds = xr.Dataset(coords={'latitude': latitude, 'longitude': longitude})
 
@@ -92,13 +98,13 @@ def geo_expected(geo_dataset, dataset_dims_shape, geo_indexer, indexer_dims_shap
 
 
 @pytest.fixture(scope='session')
-def xyz_dataset(dataset_dims_shape, array_lib):
+def xyz_dataset(dataset_dims_shape, dataset_array_lib):
     """Dataset with coords x, y, z on a grid of different shapes."""
     dims, shape = dataset_dims_shape
 
-    x = xr.DataArray(array_lib.random.uniform(0, 10, size=shape), dims=dims)
-    y = xr.DataArray(array_lib.random.uniform(0, 10, size=shape), dims=dims)
-    z = xr.DataArray(array_lib.random.uniform(0, 10, size=shape), dims=dims)
+    x = xr.DataArray(dataset_array_lib.random.uniform(0, 10, size=shape), dims=dims)
+    y = xr.DataArray(dataset_array_lib.random.uniform(0, 10, size=shape), dims=dims)
+    z = xr.DataArray(dataset_array_lib.random.uniform(0, 10, size=shape), dims=dims)
 
     ds = xr.Dataset(coords={'x': x, 'y': y, 'z': z})
 
@@ -106,13 +112,13 @@ def xyz_dataset(dataset_dims_shape, array_lib):
 
 
 @pytest.fixture(scope='session')
-def xyz_indexer(indexer_dims_shape, array_lib):
+def xyz_indexer(indexer_dims_shape, indexer_array_lib):
     """Indexer dataset with coords xx, yy, zz of parametrized shapes."""
     dims, shape = indexer_dims_shape
 
-    xx = xr.DataArray(array_lib.random.uniform(0, 10, size=shape), dims=dims)
-    yy = xr.DataArray(array_lib.random.uniform(0, 10, size=shape), dims=dims)
-    zz = xr.DataArray(array_lib.random.uniform(0, 10, size=shape), dims=dims)
+    xx = xr.DataArray(indexer_array_lib.random.uniform(0, 10, size=shape), dims=dims)
+    yy = xr.DataArray(indexer_array_lib.random.uniform(0, 10, size=shape), dims=dims)
+    zz = xr.DataArray(indexer_array_lib.random.uniform(0, 10, size=shape), dims=dims)
 
     ds = xr.Dataset(coords={'xx': xx, 'yy': yy, 'zz': zz})
 

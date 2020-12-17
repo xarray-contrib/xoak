@@ -8,7 +8,7 @@ from .index.base import Index, IndexAdapter, XoakIndexWrapper
 
 try:
     from dask.delayed import Delayed
-except ImportError:
+except ImportError:  # pragma: no cover
     Delayed = Type[None]
 
 
@@ -116,13 +116,16 @@ class XoakAccessor:
             self._index = self._build_index_forest_delayed(X, persist=persist, **kwargs)
 
     @property
-    def index(self) -> Union[Index, Iterable[Index]]:
-        """Returns the underlying index object(s).
+    def index(self) -> Union[None, Index, Iterable[Index]]:
+        """Returns the underlying index object(s), or ``None`` if no index has
+        been set yet.
 
         May trigger computation of lazy indexes.
 
         """
-        if isinstance(self._index, XoakIndexWrapper):
+        if not getattr(self, '_index', False):
+            return None
+        elif isinstance(self._index, XoakIndexWrapper):
             return self._index.index
         else:
             import dask
@@ -241,7 +244,7 @@ class XoakAccessor:
         coordinates are chunked.
 
         """
-        if self._index is None:
+        if not getattr(self, '_index', False):
             raise ValueError(
                 'The index(es) has/have not been built yet. Call `.xoak.set_index()` first'
             )
