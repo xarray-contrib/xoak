@@ -7,9 +7,21 @@ irregular, n-dimensional data.
 Table of contents
 -----------------
 
+**Getting Started**
+
+* :doc:`install`
+* :doc:`examples/index`
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Getting Started
+
+   install
+   examples/index
+
 **Help & Reference**
 
-* :doc:`examples/index`
 * :doc:`api`
 * :doc:`release_notes`
 
@@ -18,7 +30,6 @@ Table of contents
    :hidden:
    :caption: Help & Reference
 
-   examples/index
    api
    release_notes
 
