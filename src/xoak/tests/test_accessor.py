@@ -21,6 +21,20 @@ def test_set_index_error():
         ds.xoak.set_index(['x', 'z'], 'scipy_kdtree')
 
 
+def test_set_index_persist_false():
+    ds = xr.Dataset(
+        coords={
+            'x': ('a', [0, 1, 2, 3]),
+            'y': ('a', [0, 1, 2, 3]),
+        }
+    )
+    ds = ds.chunk(2)
+
+    ds.xoak.set_index(['x', 'y'], 'scipy_kdtree', persist=False)
+
+    assert isinstance(ds.xoak._index, tuple)
+
+
 def test_sel_error():
     ds = xr.Dataset(
         coords={
