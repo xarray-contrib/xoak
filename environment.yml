@@ -14,7 +14,6 @@ dependencies:
   - notebook
   - ipykernel
   - matplotlib
-  - pys2index
   - pip
   - pip:
       - git+https://github.com/ESM-VFC/xoak

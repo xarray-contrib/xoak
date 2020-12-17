@@ -38,9 +38,9 @@ setup(
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
     include_package_data=True,
-    install_requires=['xarray', 'numpy', 'dask', 'scikit-learn'],
+    install_requires=['xarray', 'numpy', 'dask', 'scipy'],
     extras_require={
-        'dev': ['pytest', 'pytest-cov', 'pre-commit'],
+        'dev': ['scikit-learn', 'pytest', 'pytest-cov', 'pre-commit'],
     },
     license='MIT',
     zip_safe=False,
