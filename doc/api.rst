@@ -36,6 +36,7 @@ properties listed below. Proper use of this accessor should be like:
 
     Dataset.xoak.set_index
     Dataset.xoak.sel
+    Dataset.xoak.get_indexers
 
 DataArray.xoak
 --------------
@@ -58,6 +59,7 @@ The accessor above is also registered for :py:class:`xarray.DataArray`.
 
     DataArray.xoak.set_index
     DataArray.xoak.sel
+    DataArray.xoak.get_indexers
 
 Indexes
 -------
