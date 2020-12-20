@@ -224,10 +224,10 @@ class XoakAccessor:
 
         return pos_indexers
 
-    def sel(
+    def get_indexers(
         self, indexers: Mapping[Hashable, Any] = None, **indexers_kwargs: Any
     ) -> Union[xr.Dataset, xr.DataArray]:
-        """Selection based on an tree index.
+        """Indexers based on an tree index.
 
         The index must have been already built using `xoak.set_index()`.
 
@@ -253,10 +253,34 @@ class XoakAccessor:
         indices = self._query(indexers)
 
         if not isinstance(indices, np.ndarray):
-            # TODO: remove (see todo below)
+            # TODO: remove (see TODO in self.sel below)
             indices = indices.compute()
 
         pos_indexers = self._get_pos_indexers(indices, indexers)
+
+        return pos_indexers
+
+    def sel(
+        self, indexers: Mapping[Hashable, Any] = None, **indexers_kwargs: Any
+    ) -> Union[xr.Dataset, xr.DataArray]:
+        """Selection based on an tree index.
+
+        The index must have been already built using `xoak.set_index()`.
+
+        It behaves mostly like :meth:`xarray.Dataset.sel` and
+        :meth:`xarray.DataArray.sel` methods, with some limitations:
+
+        - Orthogonal indexing is not supported
+        - For vectorized (point-wise) indexing, you need to supply xarray
+          objects
+        - Use it for nearest neighbor lookup only (it implicitly
+          assumes method="nearest")
+
+        This triggers :func:`dask.compute` if the given indexers and/or the index
+        coordinates are chunked.
+
+        """
+        pos_indexers = self.get_indexers(indexers, **indexers_kwargs)
 
         # TODO: issue in xarray. 1-dimensional xarray.Variables are always considered
         # as OuterIndexer, while we want here VectorizedIndexer
