@@ -227,7 +227,7 @@ class XoakAccessor:
     def sel(
         self, indexers: Mapping[Hashable, Any] = None, **indexers_kwargs: Any
     ) -> Union[xr.Dataset, xr.DataArray]:
-        """Selection based on a ball tree index.
+        """Selection based on an tree index.
 
         The index must have been already built using `xoak.set_index()`.
 
