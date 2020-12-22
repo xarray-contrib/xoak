@@ -19,7 +19,7 @@ def test_s2point(geo_dataset, geo_indexer, geo_expected):
 def test_s2point_via_query(geo_dataset, geo_indexer, geo_expected):
     geo_dataset.xoak.set_index(['lat', 'lon'], 's2point')
     ds_indexer = geo_dataset.xoak.query(lat=geo_indexer.latitude, lon=geo_indexer.longitude)
-    ds_sel = geo_dataset.xoak.isel(ds_indexer)
+    ds_sel = geo_dataset.isel(ds_indexer)
 
     xr.testing.assert_equal(ds_sel.load(), geo_expected.load())
 
