@@ -1,7 +1,7 @@
 import abc
 import warnings
 from contextlib import suppress
-from typing import Any, Dict, List, Mapping, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 import numpy as np
 
@@ -42,7 +42,9 @@ class IndexAdapter(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def query(self, index: Index, points: np.ndarray, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
+    def query(
+        self, index: Index, points: np.ndarray, query_kwargs: Any
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Query points/samples,
 
         Parameters
@@ -233,8 +235,8 @@ class XoakIndexWrapper:
     def index(self):
         return self._index
 
-    def query(self, points: np.ndarray) -> np.ndarray:
-        distances, positions = self._index_adapter.query(self._index, points)
+    def query(self, points: np.ndarray, query_kwargs: Optional[Dict]) -> np.ndarray:
+        distances, positions = self._index_adapter.query(self._index, points, query_kwargs)
 
         result = np.empty(shape=points.shape[0], dtype=self._query_result_dtype)
         result['distances'] = distances.ravel().astype(np.double)

@@ -1,4 +1,4 @@
-from typing import Any, Hashable, Iterable, List, Mapping, Tuple, Type, Union
+from typing import Any, Dict, Hashable, Iterable, List, Mapping, Optional, Tuple, Type, Union
 
 import numpy as np
 import xarray as xr
@@ -133,12 +133,12 @@ class XoakAccessor:
             index_wrappers = dask.compute(*self._index)
             return [wrp.index for wrp in index_wrappers]
 
-    def _query(self, indexers):
+    def _query(self, indexers, query_kwargs=None):
         X = coords_to_point_array([indexers[c] for c in self._index_coords])
 
         if isinstance(X, np.ndarray) and isinstance(self._index, XoakIndexWrapper):
             # directly call index wrapper's query method
-            res = self._index.query(X)
+            res = self._index.query(X, query_kwargs)
             results = res['indices'][:, 0]
 
         else:
@@ -168,7 +168,7 @@ class XoakAccessor:
                 shape = (chunk_npoints, 1)
 
                 for idx in indexes:
-                    dlyd = dask.delayed(idx.query)(chunk)
+                    dlyd = dask.delayed(idx.query)(chunk, query_kwargs=query_kwargs)
                     res_chunk_idx.append(
                         da.from_delayed(dlyd, shape, dtype=XoakIndexWrapper._query_result_dtype)
                     )
@@ -225,7 +225,10 @@ class XoakAccessor:
         return pos_indexers
 
     def query(
-        self, indexers: Mapping[Hashable, Any] = None, **indexers_kwargs: Any
+        self,
+        indexers: Mapping[Hashable, Any] = None,
+        query_kwargs: Optional[Dict] = None,
+        **indexers_kwargs: Any
     ) -> Union[xr.Dataset, xr.DataArray]:
         """Directly query the underlying tree index.
 
@@ -246,8 +249,8 @@ class XoakAccessor:
                 'The index(es) has/have not been built yet. Call `.xoak.set_index()` first'
             )
 
-        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, 'xoak.sel')
-        indices = self._query(indexers)
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, 'xoak.query')
+        indices = self._query(indexers, query_kwargs)
 
         if not isinstance(indices, np.ndarray):
             # TODO: remove (see TODO in self.sel below)

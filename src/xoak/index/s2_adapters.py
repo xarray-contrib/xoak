@@ -23,7 +23,7 @@ class S2PointIndexAdapter(IndexAdapter):
         self._points_nbytes = points.nbytes
         return S2PointIndex(points)
 
-    def query(self, s2index, points):
+    def query(self, s2index, points, query_kwargs=None):
         return s2index.query(points)
 
     def __sizeof__(self):
