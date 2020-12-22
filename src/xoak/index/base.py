@@ -42,7 +42,7 @@ class IndexAdapter(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def query(self, index: Index, points: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def query(self, index: Index, points: np.ndarray, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """Query points/samples,
 
         Parameters
@@ -52,6 +52,8 @@ class IndexAdapter(abc.ABC):
         points: ndarray of shape (n_points, n_coordinates)
             Two-dimensional array of points/samples (rows) and their
             corresponding coordinate labels (columns) to query.
+
+        Additional keywords are passed to the query method of the underlying index.
 
         Returns
         -------
