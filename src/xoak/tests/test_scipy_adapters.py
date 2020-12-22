@@ -16,7 +16,7 @@ def test_scipy_kdtree(xyz_dataset, xyz_indexer, xyz_expected):
 def test_scipy_kdtree_via_indexer(xyz_dataset, xyz_indexer, xyz_expected):
     xyz_dataset.xoak.set_index(['x', 'y', 'z'], 'scipy_kdtree')
 
-    indexers = xyz_dataset.xoak.get_indexers(x=xyz_indexer.xx, y=xyz_indexer.yy, z=xyz_indexer.zz)
+    indexers = xyz_dataset.xoak.query(x=xyz_indexer.xx, y=xyz_indexer.yy, z=xyz_indexer.zz)
     ds_sel = xyz_dataset.isel(indexers)
 
     xr.testing.assert_equal(ds_sel.load(), xyz_expected.load())

@@ -224,15 +224,12 @@ class XoakAccessor:
 
         return pos_indexers
 
-    def get_indexers(
+    def query(
         self, indexers: Mapping[Hashable, Any] = None, **indexers_kwargs: Any
     ) -> Union[xr.Dataset, xr.DataArray]:
-        """Indexers based on an tree index.
+        """Directly query the underlying tree index.
 
         The index must have been already built using `xoak.set_index()`.
-
-        It behaves mostly like :meth:`xarray.Dataset.sel` and
-        :meth:`xarray.DataArray.sel` methods, with some limitations:
 
         - Orthogonal indexing is not supported
         - For vectorized (point-wise) indexing, you need to supply xarray
@@ -258,7 +255,7 @@ class XoakAccessor:
 
         pos_indexers = self._get_pos_indexers(indices, indexers)
 
-        return pos_indexers
+        return xr.Dataset(pos_indexers)
 
     def sel(
         self, indexers: Mapping[Hashable, Any] = None, **indexers_kwargs: Any
@@ -280,7 +277,7 @@ class XoakAccessor:
         coordinates are chunked.
 
         """
-        pos_indexers = self.get_indexers(indexers, **indexers_kwargs)
+        pos_indexers = self.query(indexers, **indexers_kwargs)
 
         # TODO: issue in xarray. 1-dimensional xarray.Variables are always considered
         # as OuterIndexer, while we want here VectorizedIndexer

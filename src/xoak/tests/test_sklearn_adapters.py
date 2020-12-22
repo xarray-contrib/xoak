@@ -38,10 +38,13 @@ def test_sklearn_balltree_options():
     assert ds.xoak._index._index_adapter._index_options == {'leaf_size': 10}
 
 
-def test_sklearn_geo_balltree(geo_dataset, geo_indexer, geo_expected):
+def test_sklearn_geo_balltree(geo_dataset, geo_indexer, geo_expected, geo_expected_indexers):
     geo_dataset.xoak.set_index(['lat', 'lon'], 'sklearn_geo_balltree')
-    ds_sel = geo_dataset.xoak.sel(lat=geo_indexer.latitude, lon=geo_indexer.longitude)
 
+    ds_indexers = geo_dataset.xoak.query(lat=geo_indexer.latitude, lon=geo_indexer.longitude)
+    xr.testing.assert_equal(ds_indexers.load(), geo_expected_indexers.load())
+
+    ds_sel = geo_dataset.xoak.sel(lat=geo_indexer.latitude, lon=geo_indexer.longitude)
     xr.testing.assert_equal(ds_sel.load(), geo_expected.load())
 
 
@@ -52,4 +55,7 @@ def test_sklearn_geo_balltree_options():
 
     # sklearn tree classes init options are not exposed as class properties
     # user-defined metric should be ignored
-    assert ds.xoak._index._index_adapter._index_options == {'leaf_size': 10, 'metric': 'haversine'}
+    assert ds.xoak._index._index_adapter._index_options == {
+        'leaf_size': 10,
+        'metric': 'haversine',
+    }

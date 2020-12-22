@@ -23,7 +23,11 @@ def indexer_array_lib(request):
 
 
 @pytest.fixture(
-    params=[(('d1',), (200,)), (('d1', 'd2'), (20, 10)), (('d1', 'd2', 'd3'), (4, 10, 5))],
+    params=[
+        (('d1',), (200,)),
+        (('d1', 'd2'), (20, 10)),
+        (('d1', 'd2', 'd3'), (4, 10, 5)),
+    ],
     scope='session',
 )
 def dataset_dims_shape(request):
@@ -31,7 +35,11 @@ def dataset_dims_shape(request):
 
 
 @pytest.fixture(
-    params=[(('i1',), (100,)), (('i1', 'i2'), (10, 10)), (('i1', 'i2', 'i3'), (2, 10, 5))],
+    params=[
+        (('i1',), (100,)),
+        (('i1', 'i2'), (10, 10)),
+        (('i1', 'i2', 'i3'), (2, 10, 5)),
+    ],
     scope='session',
 )
 def indexer_dims_shape(request):
@@ -64,6 +72,34 @@ def query_brute_force(dataset, dataset_dims_shape, indexer, indexer_dims_shape, 
     return dataset.isel(indexers=pos_indexers)
 
 
+def query_brute_force_indexers(
+    dataset, dataset_dims_shape, indexer, indexer_dims_shape, metric='euclidean'
+):
+    """Find indexers for nearest neighbors using brute-force approach."""
+
+    # for lat/lon coordinate, assume they are ordered lat, lon!!
+    X = np.stack([np.ravel(c) for c in indexer.coords.values()]).T
+    Y = np.stack([np.ravel(c) for c in dataset.coords.values()]).T
+
+    if metric == 'haversine':
+        X = np.deg2rad(X)
+        Y = np.deg2rad(Y)
+
+    positions, _ = pairwise_distances_argmin_min(X, Y, metric=metric)
+
+    dataset_dims, dataset_shape = dataset_dims_shape
+    indexer_dims, indexer_shape = indexer_dims_shape
+
+    u_positions = list(np.unravel_index(positions.ravel(), dataset_shape))
+
+    pos_indexers = {
+        dim: xr.Variable(indexer_dims, ind.reshape(indexer_shape))
+        for dim, ind in zip(dataset_dims, u_positions)
+    }
+
+    return xr.Dataset(pos_indexers)
+
+
 @pytest.fixture(scope='session')
 def geo_dataset(dataset_dims_shape, dataset_array_lib):
     """Dataset with coords lon and lat on a grid of different shapes."""
@@ -93,7 +129,22 @@ def geo_indexer(indexer_dims_shape, indexer_array_lib):
 @pytest.fixture(scope='session')
 def geo_expected(geo_dataset, dataset_dims_shape, geo_indexer, indexer_dims_shape):
     return query_brute_force(
-        geo_dataset, dataset_dims_shape, geo_indexer, indexer_dims_shape, metric='haversine'
+        geo_dataset,
+        dataset_dims_shape,
+        geo_indexer,
+        indexer_dims_shape,
+        metric='haversine',
+    )
+
+
+@pytest.fixture(scope='session')
+def geo_expected_indexers(geo_dataset, dataset_dims_shape, geo_indexer, indexer_dims_shape):
+    return query_brute_force_indexers(
+        geo_dataset,
+        dataset_dims_shape,
+        geo_indexer,
+        indexer_dims_shape,
+        metric='haversine',
     )
 
 
