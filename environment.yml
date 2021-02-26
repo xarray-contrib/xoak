@@ -5,10 +5,12 @@ dependencies:
   - python=3.8
   - numpy
   - pandas
+  - pys2index
   - dask
   - dask-labextension
   - xarray
   - scikit-learn
+  - scipy
   - jupyter
   - jupyterlab
   - notebook

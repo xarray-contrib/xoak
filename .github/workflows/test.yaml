@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        python-version: ["3.6", "3.7", "3.8"]
+        python-version: ["3.7", "3.8", "3.9"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -38,11 +38,7 @@ jobs:
           printenv | sort
       - name: Install dependencies
         shell: bash -l {0}
-        run: mamba install xarray dask numpy scipy scikit-learn pytest pytest-cov
-      - name: Install pys2index (MacOS, Windows)
-        if: matrix.os == 'macos-latest' || matrix.os == 'windows-latest'
-        shell: bash -l {0}
-        run: mamba install pys2index
+        run: mamba install xarray dask numpy scipy scikit-learn pys2index pytest pytest-cov
       - name: Build and install xoak
         shell: bash -l {0}
         run: |
