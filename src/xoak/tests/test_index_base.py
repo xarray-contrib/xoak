@@ -16,7 +16,7 @@ class DummyIndex:
         self.points = points
         self.option = option
 
-    def query(self, points, query_kwargs):
+    def query(self, points):
         distances = np.zeros((points.shape[0]))
         indices = np.ones((points.shape[0]))
 
@@ -30,8 +30,8 @@ class DummyIndexAdapter(IndexAdapter):
     def build(self, points):
         return DummyIndex(points, **self.index_kwargs)
 
-    def query(self, index, points, query_kwargs):
-        return index.query(points, query_kwargs)
+    def query(self, index, points):
+        return index.query(points)
 
 
 def test_index_adapter_base():
@@ -39,8 +39,8 @@ def test_index_adapter_base():
         def build(self, points):
             return super().build(points)
 
-        def query(self, index, points, query_kwargs):
-            return super().query(index, points, query_kwargs)
+        def query(self, index, points):
+            return super().query(index, points)
 
     adapter = IndexAdapterSubclass()
 
@@ -48,7 +48,7 @@ def test_index_adapter_base():
         adapter.build(np.zeros((10, 2)))
 
     with pytest.raises(NotImplementedError):
-        adapter.query(None, np.zeros((10, 2)), None)
+        adapter.query(None, np.zeros((10, 2)))
 
 
 def test_index_registery_constructor():
@@ -130,7 +130,7 @@ def test_xoak_index_wrapper():
     assert isinstance(wrapper2.index, DummyIndex)
     assert wrapper2.index.option == 1
 
-    results = wrapper.query(np.zeros((5, 2)), query_kwargs=None).ravel()
+    results = wrapper.query(np.zeros((5, 2))).ravel()
 
     assert results['distances'].dtype == np.double
     assert results['indices'].dtype == np.intp

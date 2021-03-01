@@ -28,14 +28,3 @@ def test_scipy_kdtree_options():
     ds.xoak.set_index(['x', 'y'], 'scipy_kdtree', leafsize=10)
 
     assert ds.xoak.index.leafsize == 10
-
-
-def test_scipy_kdtree_query_k_points_explicit(xyz_dataset, xyz_indexer, xyz_expected):
-    xyz_dataset.xoak.set_index(['x', 'y', 'z'], 'scipy_kdtree')
-
-    indexers = xyz_dataset.xoak.query(
-        x=xyz_indexer.xx, y=xyz_indexer.yy, z=xyz_indexer.zz, query_kwargs={'k': 1}
-    )
-    ds_sel = xyz_dataset.isel(indexers)
-
-    xr.testing.assert_equal(ds_sel.load(), xyz_expected.load())

@@ -13,7 +13,5 @@ class ScipyKDTreeAdapter(IndexAdapter):
     def build(self, points):
         return cKDTree(points, **self.index_options)
 
-    def query(self, kdtree, points, query_kwargs=None):
-        if query_kwargs is None:
-            query_kwargs = {}
-        return kdtree.query(points, **query_kwargs)
+    def query(self, kdtree, points):
+        return kdtree.query(points)

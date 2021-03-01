@@ -14,10 +14,8 @@ class SklearnKDTreeAdapter(IndexAdapter):
     def build(self, points):
         return KDTree(points, **self._index_options)
 
-    def query(self, kdtree, points, query_kwargs=None):
-        if query_kwargs is None:
-            query_kwargs = {}
-        return kdtree.query(points, **query_kwargs)
+    def query(self, kdtree, points):
+        return kdtree.query(points)
 
 
 @register_default('sklearn_balltree')
@@ -30,10 +28,8 @@ class SklearnBallTreeAdapter(IndexAdapter):
     def build(self, points):
         return BallTree(points, **self._index_options)
 
-    def query(self, btree, points, query_kwargs=None):
-        if query_kwargs is None:
-            query_kwargs = {}
-        return btree.query(points, **query_kwargs)
+    def query(self, btree, points):
+        return btree.query(points)
 
 
 @register_default('sklearn_geo_balltree')
@@ -58,7 +54,5 @@ class SklearnGeoBallTreeAdapter(IndexAdapter):
     def build(self, points):
         return BallTree(np.deg2rad(points), **self._index_options)
 
-    def query(self, btree, points, query_kwargs=None):
-        if query_kwargs is None:
-            query_kwargs = {}
-        return btree.query(np.deg2rad(points), **query_kwargs)
+    def query(self, btree, points):
+        return btree.query(np.deg2rad(points))
