@@ -9,7 +9,7 @@ It provides a built-in index adapter for Scipy_'s ``cKDTree``, as well as adapte
 for index structures implemented in these 3rd-party libraries (optional
 dependencies):
 
-- Scikit-Learn_: ``BallTree`` and ``KDTree``, which support various distance metrics.
+- Scikit-Learn_: ``BallTree``_ and ``KDTree``_, which support various distance metrics.
 - pys2index_: ``S2PointIndex`` for efficient indexing of lat/lon point data,
   based on `s2geometry`.
 
@@ -17,6 +17,8 @@ Xoak also provides a mechanism for easily adding and registering custom index ad
 
 .. _Scipy: https://docs.scipy.org/doc/scipy/reference/
 .. _Scikit-Learn: https://scikit-learn.org
+.. _BallTree: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.BallTree.html
+.. _KDTree: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KDTree.html
 .. _pys2index: https://github.com/benbovy/pys2index
 
 Table of contents
