@@ -9,7 +9,7 @@ It provides a built-in index adapter for Scipy_'s ``cKDTree``, as well as adapte
 for index structures implemented in these 3rd-party libraries (optional
 dependencies):
 
-- Scikit-Learn_: ``BallTree_`` and ``KDTree_``, which support various distance metrics.
+- Scikit-Learn_: `BallTree_` and `KDTree_`, which support various distance metrics.
 - pys2index_: ``S2PointIndex`` for efficient indexing of lat/lon point data,
   based on `s2geometry`.
 
