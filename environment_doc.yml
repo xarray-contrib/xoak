@@ -16,4 +16,4 @@ dependencies:
   - xarray=0.16.2
   - pip=20.3.1
   - pip:
-      - git+https://github.com/ESM-VFC/xoak
+      - git+https://github.com/xarray-contrib/xoak
