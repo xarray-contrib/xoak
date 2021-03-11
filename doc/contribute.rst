@@ -32,7 +32,7 @@ is a very useful commit to make as well, even if you cannot fix the bug itself.
 For now, as the project is still very young, it is also a good place for
 asking usage questions.
 
-.. _`Github Issue Tracker`: https://github.com/ESM-VFC/xoak/issues
+.. _`Github Issue Tracker`: https://github.com/xarray-contrib/xoak/issues
 
 Development environment
 -----------------------
@@ -53,7 +53,7 @@ Then clone your fork locally::
 Alternatively, if you don't plan to submit any modification, you can clone the
 original Xoak git repository::
 
-   $ git clone git@github.com:ESM-VFC/xoak.git
+   $ git clone git@github.com:xarray-contrib/xoak.git
 
 .. _GitHub: https://github.com
 

@@ -67,14 +67,14 @@ html_theme = 'sphinx_rtd_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 # html_theme_options = {
-#    "github_url": "https://github.com/ESM-VFC/xoak",
+#    "github_url": "https://github.com/xarray-contrib/xoak",
 #    "use_edit_page_button": True,
 #    "search_bar_position": "navbar",
 # }
 
 
 html_context = {
-    'github_user': 'ESM-VFC',
+    'github_user': 'xarray-contrib',
     'github_repo': 'xoak',
     'github_version': 'master',
     'doc_path': 'doc',
@@ -101,11 +101,11 @@ nbsphinx_prolog = """
 
 |Binder|
 
-You can run this notebook in a `live session <https://mybinder.org/v2/gh/ESM-VFC/xoak/master?filepath=doc/{{
-docname }}>`_ or view it `on Github <https://github.com/ESM-VFC/xoak/blob/master/doc/{{ docname }}>`_.
+You can run this notebook in a `live session <https://mybinder.org/v2/gh/xarray-contrib/xoak/master?filepath=doc/{{
+docname }}>`_ or view it `on Github <https://github.com/xarray-contrib/xoak/blob/master/doc/{{ docname }}>`_.
 
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/ESM-VFC/xoak/master?filepath=doc/{{ docname }}
+   :target: https://mybinder.org/v2/gh/xarray-contrib/xoak/master?filepath=doc/{{ docname }}
 """
 
 
