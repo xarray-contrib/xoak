@@ -5,10 +5,12 @@ dependencies:
   - python=3.8
   - numpy
   - pandas
+  - pys2index
   - dask
   - dask-labextension
   - xarray
   - scikit-learn
+  - scipy
   - jupyter
   - jupyterlab
   - notebook
@@ -16,4 +18,4 @@ dependencies:
   - matplotlib
   - pip
   - pip:
-      - git+https://github.com/ESM-VFC/xoak
+      - git+https://github.com/xarray-contrib/xoak
