@@ -7,3 +7,4 @@ Examples
    introduction
    dask_support
    custom_indexes
+   query
