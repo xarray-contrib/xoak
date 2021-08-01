@@ -16,6 +16,14 @@ def test_s2point(geo_dataset, geo_indexer, geo_expected):
     xr.testing.assert_equal(ds_sel.load(), geo_expected.load())
 
 
+def test_s2point_via_query(geo_dataset, geo_indexer, geo_expected):
+    geo_dataset.xoak.set_index(['lat', 'lon'], 's2point')
+    ds_indexer = geo_dataset.xoak.query(lat=geo_indexer.latitude, lon=geo_indexer.longitude)
+    ds_sel = geo_dataset.isel(ds_indexer)
+
+    xr.testing.assert_equal(ds_sel.load(), geo_expected.load())
+
+
 def test_s2point_sizeof():
     ds = xr.Dataset(coords={'lat': ('points', [0.0, 10.0]), 'lon': ('points', [-5.0, 5.0])})
     points = np.array([[0.0, -5.0], [10.0, 5.0]])
