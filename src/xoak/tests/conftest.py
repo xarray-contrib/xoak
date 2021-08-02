@@ -23,22 +23,32 @@ def indexer_array_lib(request):
 
 
 @pytest.fixture(
-    params=[(('d1',), (200,)), (('d1', 'd2'), (20, 10)), (('d1', 'd2', 'd3'), (4, 10, 5))],
+    params=[
+        (('d1',), (200,), (100,)),
+        (('d1', 'd2'), (20, 10), (10, 10)),
+        (('d1', 'd2', 'd3'), (4, 10, 5), (2, 10, 5)),
+    ],
     scope='session',
 )
-def dataset_dims_shape(request):
+def dataset_dims_shape_chunks(request):
     return request.param
 
 
 @pytest.fixture(
-    params=[(('i1',), (100,)), (('i1', 'i2'), (10, 10)), (('i1', 'i2', 'i3'), (2, 10, 5))],
+    params=[
+        (('i1',), (100,), (50,)),
+        (('i1', 'i2'), (10, 10), (5, 10)),
+        (('i1', 'i2', 'i3'), (2, 10, 5), (1, 10, 5)),
+    ],
     scope='session',
 )
-def indexer_dims_shape(request):
+def indexer_dims_shape_chunks(request):
     return request.param
 
 
-def query_brute_force(dataset, dataset_dims_shape, indexer, indexer_dims_shape, metric='euclidean'):
+def query_brute_force(
+    dataset, dataset_dims_shape_chunks, indexer, indexer_dims_shape_chunks, metric='euclidean'
+):
     """Find nearest neighbors using brute-force approach."""
 
     # for lat/lon coordinate, assume they are ordered lat, lon!!
@@ -51,8 +61,8 @@ def query_brute_force(dataset, dataset_dims_shape, indexer, indexer_dims_shape, 
 
     positions, _ = pairwise_distances_argmin_min(X, Y, metric=metric)
 
-    dataset_dims, dataset_shape = dataset_dims_shape
-    indexer_dims, indexer_shape = indexer_dims_shape
+    dataset_dims, dataset_shape, _ = dataset_dims_shape_chunks
+    indexer_dims, indexer_shape, _ = indexer_dims_shape_chunks
 
     u_positions = list(np.unravel_index(positions.ravel(), dataset_shape))
 
@@ -65,12 +75,17 @@ def query_brute_force(dataset, dataset_dims_shape, indexer, indexer_dims_shape, 
 
 
 @pytest.fixture(scope='session')
-def geo_dataset(dataset_dims_shape, dataset_array_lib):
+def geo_dataset(dataset_dims_shape_chunks, dataset_array_lib):
     """Dataset with coords lon and lat on a grid of different shapes."""
-    dims, shape = dataset_dims_shape
+    dims, shape, chunks = dataset_dims_shape_chunks
 
-    lat = xr.DataArray(dataset_array_lib.random.uniform(-80, 80, size=shape), dims=dims)
-    lon = xr.DataArray(dataset_array_lib.random.uniform(-160, 160, size=shape), dims=dims)
+    if dataset_array_lib is dask.array:
+        kwargs = {'size': shape, 'chunks': chunks}
+    else:
+        kwargs = {'size': shape}
+
+    lat = xr.DataArray(dataset_array_lib.random.uniform(-80, 80, **kwargs), dims=dims)
+    lon = xr.DataArray(dataset_array_lib.random.uniform(-160, 160, **kwargs), dims=dims)
 
     ds = xr.Dataset(coords={'lat': lat, 'lon': lon})
 
@@ -78,12 +93,17 @@ def geo_dataset(dataset_dims_shape, dataset_array_lib):
 
 
 @pytest.fixture(scope='session')
-def geo_indexer(indexer_dims_shape, indexer_array_lib):
+def geo_indexer(indexer_dims_shape_chunks, indexer_array_lib):
     """Indexer dataset with coords longitude and latitude of parametrized shapes."""
-    dims, shape = indexer_dims_shape
+    dims, shape, chunks = indexer_dims_shape_chunks
 
-    latitude = xr.DataArray(indexer_array_lib.random.uniform(-80, 80, size=shape), dims=dims)
-    longitude = xr.DataArray(indexer_array_lib.random.uniform(-160, 160, size=shape), dims=dims)
+    if indexer_array_lib is dask.array:
+        kwargs = {'size': shape, 'chunks': chunks}
+    else:
+        kwargs = {'size': shape}
+
+    latitude = xr.DataArray(indexer_array_lib.random.uniform(-80, 80, **kwargs), dims=dims)
+    longitude = xr.DataArray(indexer_array_lib.random.uniform(-160, 160, **kwargs), dims=dims)
 
     ds = xr.Dataset(coords={'latitude': latitude, 'longitude': longitude})
 
@@ -91,20 +111,29 @@ def geo_indexer(indexer_dims_shape, indexer_array_lib):
 
 
 @pytest.fixture(scope='session')
-def geo_expected(geo_dataset, dataset_dims_shape, geo_indexer, indexer_dims_shape):
+def geo_expected(geo_dataset, dataset_dims_shape_chunks, geo_indexer, indexer_dims_shape_chunks):
     return query_brute_force(
-        geo_dataset, dataset_dims_shape, geo_indexer, indexer_dims_shape, metric='haversine'
+        geo_dataset,
+        dataset_dims_shape_chunks,
+        geo_indexer,
+        indexer_dims_shape_chunks,
+        metric='haversine',
     )
 
 
 @pytest.fixture(scope='session')
-def xyz_dataset(dataset_dims_shape, dataset_array_lib):
+def xyz_dataset(dataset_dims_shape_chunks, dataset_array_lib):
     """Dataset with coords x, y, z on a grid of different shapes."""
-    dims, shape = dataset_dims_shape
+    dims, shape, chunks = dataset_dims_shape_chunks
 
-    x = xr.DataArray(dataset_array_lib.random.uniform(0, 10, size=shape), dims=dims)
-    y = xr.DataArray(dataset_array_lib.random.uniform(0, 10, size=shape), dims=dims)
-    z = xr.DataArray(dataset_array_lib.random.uniform(0, 10, size=shape), dims=dims)
+    if dataset_array_lib is dask.array:
+        kwargs = {'size': shape, 'chunks': chunks}
+    else:
+        kwargs = {'size': shape}
+
+    x = xr.DataArray(dataset_array_lib.random.uniform(0, 10, **kwargs), dims=dims)
+    y = xr.DataArray(dataset_array_lib.random.uniform(0, 10, **kwargs), dims=dims)
+    z = xr.DataArray(dataset_array_lib.random.uniform(0, 10, **kwargs), dims=dims)
 
     ds = xr.Dataset(coords={'x': x, 'y': y, 'z': z})
 
@@ -112,13 +141,18 @@ def xyz_dataset(dataset_dims_shape, dataset_array_lib):
 
 
 @pytest.fixture(scope='session')
-def xyz_indexer(indexer_dims_shape, indexer_array_lib):
+def xyz_indexer(indexer_dims_shape_chunks, indexer_array_lib):
     """Indexer dataset with coords xx, yy, zz of parametrized shapes."""
-    dims, shape = indexer_dims_shape
+    dims, shape, chunks = indexer_dims_shape_chunks
 
-    xx = xr.DataArray(indexer_array_lib.random.uniform(0, 10, size=shape), dims=dims)
-    yy = xr.DataArray(indexer_array_lib.random.uniform(0, 10, size=shape), dims=dims)
-    zz = xr.DataArray(indexer_array_lib.random.uniform(0, 10, size=shape), dims=dims)
+    if indexer_array_lib is dask.array:
+        kwargs = {'size': shape, 'chunks': chunks}
+    else:
+        kwargs = {'size': shape}
+
+    xx = xr.DataArray(indexer_array_lib.random.uniform(0, 10, **kwargs), dims=dims)
+    yy = xr.DataArray(indexer_array_lib.random.uniform(0, 10, **kwargs), dims=dims)
+    zz = xr.DataArray(indexer_array_lib.random.uniform(0, 10, **kwargs), dims=dims)
 
     ds = xr.Dataset(coords={'xx': xx, 'yy': yy, 'zz': zz})
 
@@ -126,5 +160,7 @@ def xyz_indexer(indexer_dims_shape, indexer_array_lib):
 
 
 @pytest.fixture(scope='session')
-def xyz_expected(xyz_dataset, dataset_dims_shape, xyz_indexer, indexer_dims_shape):
-    return query_brute_force(xyz_dataset, dataset_dims_shape, xyz_indexer, indexer_dims_shape)
+def xyz_expected(xyz_dataset, dataset_dims_shape_chunks, xyz_indexer, indexer_dims_shape_chunks):
+    return query_brute_force(
+        xyz_dataset, dataset_dims_shape_chunks, xyz_indexer, indexer_dims_shape_chunks
+    )
