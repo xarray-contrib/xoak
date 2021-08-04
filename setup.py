@@ -34,7 +34,7 @@ setup(
     maintainer='Benoit Bovy, Willi Rath',
     maintainer_email='benbovy@gmail.com',
     classifiers=CLASSIFIERS,
-    url='https://github.com/esm-vfc/xoak',
+    url='https://github.com/xarray-contrib/xoak',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
     include_package_data=True,
