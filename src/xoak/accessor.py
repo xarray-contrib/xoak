@@ -185,7 +185,7 @@ class XoakAccessor:
             indices_col = da.argmin(distances, axis=1)
 
             results = da.blockwise(
-                lambda arr, icol: np.take_along_axis(arr, icol[:, None], 1),
+                lambda arr, icol: np.take_along_axis(arr, icol[:, None], 1).squeeze(),
                 'i',
                 indices,
                 'ik',
