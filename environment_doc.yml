@@ -2,18 +2,18 @@ name: xoak
 channels:
   - conda-forge
 dependencies:
-  - python=3.8
-  - dask=2.30.0
-  - ipykernel=5.4.2
-  - matplotlib=3.3.3
-  - nbsphinx=0.7.1
-  - numpy=1.19.4
-  - pys2index=0.1.0
-  - scikit-learn=0.23.2
-  - sphinx=3.3.1
-  - sphinx-autosummary-accessors=0.1.2
-  - sphinx_rtd_theme=0.5.0
-  - xarray=0.16.2
-  - pip=20.3.1
+  - python=3.9.6
+  - dask=2021.7.2
+  - ipykernel=6.0.3
+  - matplotlib-base=3.4.2
+  - nbsphinx=0.8.6
+  - numpy=1.21.1
+  - pys2index=0.1.2
+  - scikit-learn=0.24.2
+  - sphinx=4.1.2
+  - sphinx-autosummary-accessors=0.2.1
+  - sphinx_rtd_theme=0.5.2
+  - xarray=0.19.0
+  - pip=21.2.2
   - pip:
       - git+https://github.com/xarray-contrib/xoak
