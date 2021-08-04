@@ -44,6 +44,11 @@ extensions = [
     'nbsphinx',
 ]
 
+extlinks = {
+    'issue': ('https://github.com/xarray-contrib/xoak/issues/%s', 'GH'),
+    'pull': ('https://github.com/xarray-contrib/xoak/pull/%s', 'PR'),
+}
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = [
     '_templates',
