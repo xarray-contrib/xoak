@@ -137,7 +137,7 @@ class XoakAccessor:
         """Find the distance(s) and indices of nearest point(s).
 
         Note that the distance is converted in function from radians to kilometers
-        by multiplying by the radius of the earth and dividing the resulting meters by 1000.
+        by multiplying by the radius of the earth in km.
         """
         X = coords_to_point_array([indexers[c] for c in self._index_coords])
 
@@ -201,7 +201,7 @@ class XoakAccessor:
                 concatenate=True,
             )
 
-        return results, distances * 6371000 / 1000
+        return results, distances * 6371
 
     def _get_pos_indexers(self, indices, indexers):
         """Returns positional indexers based on the query results and the
