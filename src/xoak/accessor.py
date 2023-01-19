@@ -296,6 +296,9 @@ class XoakAccessor:
                 'long_name': 'Distance from location to nearest comparison point.',
             }
             dims = indexers[list(indexers.keys())[0]].dims
-            result[distances_name] = (dims, distances.reshape(len(dims)), attrs)
+            if distances.ndim != len(dims):
+                result[distances_name] = (dims, distances.reshape(len(dims)), attrs)
+            else:
+                result[distances_name] = (dims, distances, attrs)
 
         return result
