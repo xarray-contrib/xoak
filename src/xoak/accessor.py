@@ -295,10 +295,11 @@ class XoakAccessor:
                 'units': 'km',
                 'long_name': 'Distance from location to nearest comparison point.',
             }
-            dims = indexers[list(indexers.keys())[0]].dims
-            if distances.ndim != len(dims):
-                result[distances_name] = (dims, distances.reshape(len(dims)), attrs)
-            else:
-                result[distances_name] = (dims, distances, attrs)
+
+            indexer_dim = list(indexers.values())[0].dims
+            indexer_shape = indexers[list(indexers.keys())[0]].shape
+            result[distances_name] = xr.Variable(
+                indexer_dim, distances.reshape(indexer_shape), attrs
+            )
 
         return result
