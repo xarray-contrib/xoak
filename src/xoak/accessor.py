@@ -135,8 +135,8 @@ class XoakAccessor:
 
     def _query(self, indexers):
         """Find the distance(s) and indices of nearest point(s).
-        
-        Note that the distance is converted in function from radians to kilometers 
+
+        Note that the distance is converted in function from radians to kilometers
         by multiplying by the radius of the earth and dividing the resulting meters by 1000.
         """
         X = coords_to_point_array([indexers[c] for c in self._index_coords])
@@ -201,7 +201,7 @@ class XoakAccessor:
                 concatenate=True,
             )
 
-        return results, distances*6371000/1000
+        return results, distances * 6371000 / 1000
 
     def _get_pos_indexers(self, indices, indexers):
         """Returns positional indexers based on the query results and the
@@ -231,7 +231,10 @@ class XoakAccessor:
         return pos_indexers
 
     def sel(
-        self, indexers: Mapping[Hashable, Any] = None, distances_name: Optional[str] = None, **indexers_kwargs: Any,
+        self,
+        indexers: Mapping[Hashable, Any] = None,
+        distances_name: Optional[str] = None,
+        **indexers_kwargs: Any,
     ) -> Union[xr.Dataset, xr.DataArray]:
         """Selection based on a ball tree index.
 
@@ -248,7 +251,7 @@ class XoakAccessor:
 
         This triggers :func:`dask.compute` if the given indexers and/or the index
         coordinates are chunked.
-        
+
         Parameters
         ----------
         distances_name: str, optional
@@ -260,7 +263,7 @@ class XoakAccessor:
         xr.Dataset, xr.DataArray
             Normally, the type input is the type output. However, if you input a
             str for `distances_name`, the return type will be Dataset to
-            accommodate the additional variable. 
+            accommodate the additional variable.
         """
         if not getattr(self, '_index', False):
             raise ValueError(
@@ -280,7 +283,7 @@ class XoakAccessor:
         # as OuterIndexer, while we want here VectorizedIndexer
         # This would also allow lazy selection
         result = self._xarray_obj.isel(indexers=pos_indexers)
-        
+
         # save distances as a new variable in xarray object if name is input
         if distances_name is not None:
             # need to have a Dataset instead of DataArray to add a new variable

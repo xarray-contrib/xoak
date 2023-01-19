@@ -9,12 +9,12 @@ repos:
       - id: double-quote-string-fixer
 
   - repo: https://github.com/ambv/black
-    rev: 20.8b1
+    rev: 22.3.0  # https://github.com/psf/black/issues/2964
     hooks:
       - id: black
         args: ["--line-length", "100", "--skip-string-normalization"]
 
-  - repo: https://gitlab.com/PyCQA/flake8
+  - repo: https://github.com/pycqa/flake8
     rev: 3.8.4
     hooks:
       - id: flake8
