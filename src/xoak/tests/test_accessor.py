@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 import xarray as xr
 from scipy.spatial import cKDTree
 
@@ -80,3 +81,23 @@ def test_index_property():
     ds_chunk = ds.chunk(2)
     ds_chunk.xoak.set_index(['x', 'y'], 'scipy_kdtree')
     assert isinstance(ds_chunk.xoak.index, list)
+
+
+def test_distances():
+
+    ds = xr.Dataset(
+        coords={
+            'x': ('a', [0, 1, 2, 3]),
+            'y': ('a', [0, 1, 2, 3]),
+        }
+    )
+
+    ds_to_find = xr.Dataset({"lat_to_find": ("a", [0, 0]), "lon_to_find": ("a", [0, 0.5])})
+    ds.xoak.set_index(['y', 'x'], "sklearn_geo_balltree")
+    
+    output = ds.xoak.sel(
+        {'y': ds_to_find.lat_to_find, 'x': ds_to_find.lon_to_find}, distances_name="distances"
+    )
+    
+    assert isinstance(output, xr.Dataset)
+    assert np.allclose(output["distances"], [0, 55.59746332])
