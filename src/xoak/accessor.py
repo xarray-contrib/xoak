@@ -292,5 +292,8 @@ class XoakAccessor:
                 result = result.to_dataset()
             # use same dimensions as indexers
             result[distances_name] = (indexers[list(indexers.keys())[0]].dims, distances)
+            # add attributes
+            result[distances_name].attrs["units"] = "km"
+            result[distances_name].attrs["long_name"] = "Distance from location to nearest comparison point."
 
         return result
