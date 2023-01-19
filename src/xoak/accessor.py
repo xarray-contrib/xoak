@@ -291,7 +291,10 @@ class XoakAccessor:
             if not isinstance(result, xr.Dataset):
                 result = result.to_dataset()
             # use same dimensions as indexers
-            attrs = {'units': 'km', 'long_name': 'Distance from location to nearest comparison point.'}
+            attrs = {
+                'units': 'km',
+                'long_name': 'Distance from location to nearest comparison point.',
+            }
             dims = indexers[list(indexers.keys())[0]].dims
             result[distances_name] = (dims, distances.reshape(len(dims)), attrs)
 
