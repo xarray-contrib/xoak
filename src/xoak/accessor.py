@@ -281,7 +281,9 @@ class XoakAccessor:
         result = self._xarray_obj.isel(indexers=pos_indexers)
 
         # save distances as a new variable in xarray object if name is input
-        if distances_name is not None:
+        if distances_name is not None or (
+            isinstance(distances_name, str) and len(distances_name) == 0
+        ):
             # need to have a Dataset instead of DataArray to add a new variable
             # otherwise goes in as a coordinate
             if not isinstance(result, xr.Dataset):
