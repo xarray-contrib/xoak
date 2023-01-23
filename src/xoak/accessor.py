@@ -1,4 +1,4 @@
-from typing import Any, Hashable, Iterable, List, Mapping, Tuple, Type, Union
+from typing import Any, Hashable, Iterable, List, Mapping, Optional, Tuple, Type, Union
 
 import numpy as np
 import xarray as xr
@@ -134,12 +134,14 @@ class XoakAccessor:
             return [wrp.index for wrp in index_wrappers]
 
     def _query(self, indexers):
+        """Find the distance(s) and indices of nearest point(s)."""
         X = coords_to_point_array([indexers[c] for c in self._index_coords])
 
         if isinstance(X, np.ndarray) and isinstance(self._index, XoakIndexWrapper):
             # directly call index wrapper's query method
             res = self._index.query(X)
             results = res['indices'][:, 0]
+            distances = res['distances'][:, 0]
 
         else:
             # Two-stage lazy query with dask
@@ -195,7 +197,7 @@ class XoakAccessor:
                 concatenate=True,
             )
 
-        return results
+        return results, distances
 
     def _get_pos_indexers(self, indices, indexers):
         """Returns positional indexers based on the query results and the
@@ -225,7 +227,10 @@ class XoakAccessor:
         return pos_indexers
 
     def sel(
-        self, indexers: Mapping[Hashable, Any] = None, **indexers_kwargs: Any
+        self,
+        indexers: Mapping[Hashable, Any] = None,
+        distances_name: Optional[str] = None,
+        **indexers_kwargs: Any,
     ) -> Union[xr.Dataset, xr.DataArray]:
         """Selection based on a ball tree index.
 
@@ -243,6 +248,18 @@ class XoakAccessor:
         This triggers :func:`dask.compute` if the given indexers and/or the index
         coordinates are chunked.
 
+        Parameters
+        ----------
+        distances_name: str, optional
+            If a string is input, it is used to save the distances into the xarray
+            object. Distances are in km.
+
+        Returns
+        -------
+        xr.Dataset, xr.DataArray
+            Normally, the type input is the type output. However, if you input a
+            str for `distances_name`, the return type will be Dataset to
+            accommodate the additional variable.
         """
         if not getattr(self, '_index', False):
             raise ValueError(
@@ -250,7 +267,7 @@ class XoakAccessor:
             )
 
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, 'xoak.sel')
-        indices = self._query(indexers)
+        indices, distances = self._query(indexers)
 
         if not isinstance(indices, np.ndarray):
             # TODO: remove (see todo below)
@@ -262,5 +279,24 @@ class XoakAccessor:
         # as OuterIndexer, while we want here VectorizedIndexer
         # This would also allow lazy selection
         result = self._xarray_obj.isel(indexers=pos_indexers)
+
+        # save distances as a new variable in xarray object if name is input
+        if distances_name is not None or (
+            isinstance(distances_name, str) and len(distances_name) == 0
+        ):
+            # need to have a Dataset instead of DataArray to add a new variable
+            # otherwise goes in as a coordinate
+            if not isinstance(result, xr.Dataset):
+                result = result.to_dataset()
+            # use same dimensions as indexers
+            attrs = {
+                'long_name': 'Distance from location to nearest comparison point.',
+            }
+
+            indexer_dim = list(indexers.values())[0].dims
+            indexer_shape = indexers[list(indexers.keys())[0]].shape
+            result[distances_name] = xr.Variable(
+                indexer_dim, distances.reshape(indexer_shape), attrs
+            )
 
         return result
