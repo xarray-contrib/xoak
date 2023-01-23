@@ -100,4 +100,5 @@ def test_distances():
     )
 
     assert isinstance(output, xr.Dataset)
-    assert np.allclose(output['distances'], [0, 55.59746332])
+    # this distance is in radians
+    assert np.allclose(output['distances'], [0, 0.00872665])

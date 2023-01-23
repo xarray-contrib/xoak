@@ -134,11 +134,7 @@ class XoakAccessor:
             return [wrp.index for wrp in index_wrappers]
 
     def _query(self, indexers):
-        """Find the distance(s) and indices of nearest point(s).
-
-        Note that the distance is converted in function from radians to kilometers
-        by multiplying by the radius of the earth in km.
-        """
+        """Find the distance(s) and indices of nearest point(s)."""
         X = coords_to_point_array([indexers[c] for c in self._index_coords])
 
         if isinstance(X, np.ndarray) and isinstance(self._index, XoakIndexWrapper):
@@ -201,7 +197,7 @@ class XoakAccessor:
                 concatenate=True,
             )
 
-        return results, distances * 6371
+        return results, distances
 
     def _get_pos_indexers(self, indices, indexers):
         """Returns positional indexers based on the query results and the
@@ -292,7 +288,6 @@ class XoakAccessor:
                 result = result.to_dataset()
             # use same dimensions as indexers
             attrs = {
-                'units': 'km',
                 'long_name': 'Distance from location to nearest comparison point.',
             }
 
