@@ -48,9 +48,7 @@ def test_sklearn_geo_balltree(geo_dataset, geo_indexer, geo_expected):
 def test_sklearn_geo_balltree_options():
     ds = xr.Dataset(coords={"x": ("points", [1, 2]), "y": ("points", [1, 2])})
 
-    ds.xoak.set_index(
-        ["x", "y"], "sklearn_geo_balltree", leaf_size=10, metric="euclidean"
-    )
+    ds.xoak.set_index(["x", "y"], "sklearn_geo_balltree", leaf_size=10, metric="euclidean")
 
     # sklearn tree classes init options are not exposed as class properties
     # user-defined metric should be ignored

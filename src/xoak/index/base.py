@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import abc
 import warnings
+from collections.abc import Mapping
 from contextlib import suppress
-from typing import Any, Dict, List, Mapping, Tuple, Type, TypeVar, Union
+from typing import Any, TypeVar
 
 import numpy as np
 
@@ -42,7 +45,7 @@ class IndexAdapter(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def query(self, index: Index, points: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def query(self, index: Index, points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """Query points/samples,
 
         Parameters
@@ -69,13 +72,13 @@ class IndexRegistrationWarning(Warning):
     """Warning for conflicts in index registration."""
 
 
-class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
+class IndexRegistry(Mapping[str, type[IndexAdapter]]):
     """A registry of all indexes adapters that can be used to select data
     with xoak.
 
     """
 
-    _default_indexes: Dict[str, Type[IndexAdapter]] = {}
+    _default_indexes: dict[str, type[IndexAdapter]] = {}
 
     def __init__(self, use_default=True):
         """Creates a new index registry.
@@ -107,7 +110,7 @@ class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
 
         """
 
-        def wrap(cls: Type[IndexAdapter]):
+        def wrap(cls: type[IndexAdapter]):
             if not issubclass(cls, IndexAdapter):
                 raise TypeError("can only register IndexAdapter subclasses.")
 
@@ -178,7 +181,7 @@ def register_default(name: str):
 
     """
 
-    def decorator(cls: Type[IndexAdapter]):
+    def decorator(cls: type[IndexAdapter]):
         if cls.__doc__ is not None:
             cls.__doc__ += doc_extra
         else:
@@ -190,7 +193,7 @@ def register_default(name: str):
     return decorator
 
 
-def normalize_index(name_or_cls: Union[str, Any]) -> Type[IndexAdapter]:
+def normalize_index(name_or_cls: str | Any) -> type[IndexAdapter]:
     if isinstance(name_or_cls, str):
         cls = IndexRegistry._default_indexes[name_or_cls]
     else:
@@ -208,14 +211,14 @@ class XoakIndexWrapper:
 
     """
 
-    _query_result_dtype: List[Tuple[str, Any]] = [
+    _query_result_dtype: list[tuple[str, Any]] = [
         ("distances", np.double),
         ("indices", np.intp),
     ]
 
     def __init__(
         self,
-        index_adapter: Union[str, Type[IndexAdapter]],
+        index_adapter: str | type[IndexAdapter],
         points: np.ndarray,
         offset: int,
         **kwargs,

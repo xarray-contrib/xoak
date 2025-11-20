@@ -107,7 +107,8 @@ nbsphinx_prolog = """
 |Binder|
 
 You can run this notebook in a `live session <https://mybinder.org/v2/gh/xarray-contrib/xoak/master?filepath=doc/{{
-docname }}>`_ or view it `on Github <https://github.com/xarray-contrib/xoak/blob/master/doc/{{ docname }}>`_.
+docname }}>`_
+or view it `on Github <https://github.com/xarray-contrib/xoak/blob/master/doc/{{ docname }}>`_.
 
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/xarray-contrib/xoak/master?filepath=doc/{{ docname }}

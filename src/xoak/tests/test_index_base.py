@@ -17,8 +17,8 @@ class DummyIndex:
         self.option = option
 
     def query(self, points):
-        distances = np.zeros((points.shape[0]))
-        indices = np.ones((points.shape[0]))
+        distances = np.zeros(points.shape[0])
+        indices = np.ones(points.shape[0])
 
         return distances, indices
 
@@ -63,9 +63,7 @@ def test_index_registery_register():
     registry = IndexRegistry(use_default=False)
     registry.register("dummy")(DummyIndexAdapter)
 
-    with pytest.warns(
-        IndexRegistrationWarning, match="overriding an already registered index.*"
-    ):
+    with pytest.warns(IndexRegistrationWarning, match="overriding an already registered index.*"):
         registry.register("dummy")(DummyIndexAdapter)
 
     with pytest.raises(TypeError, match="can only register IndexAdapter subclasses."):
