@@ -1,4 +1,5 @@
 import dask
+import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
@@ -10,13 +11,13 @@ from sklearn.metrics import pairwise_distances_argmin_min
 dask.config.set(scheduler="single-threaded")
 
 
-@pytest.fixture(params=[np, dask.array], scope="session")
+@pytest.fixture(params=[np, da], scope="session")
 def dataset_array_lib(request):
     """Array lib that is used for creation of the data."""
     return request.param
 
 
-@pytest.fixture(params=[np, dask.array], scope="session")
+@pytest.fixture(params=[np, da], scope="session")
 def indexer_array_lib(request):
     """Array lib that is used for creation of the indexer."""
     return request.param
@@ -83,7 +84,7 @@ def geo_dataset(dataset_dims_shape_chunks, dataset_array_lib):
     """Dataset with coords lon and lat on a grid of different shapes."""
     dims, shape, chunks = dataset_dims_shape_chunks
 
-    if dataset_array_lib is dask.array:
+    if dataset_array_lib is da:
         kwargs = {"size": shape, "chunks": chunks}
     else:
         kwargs = {"size": shape}
@@ -101,17 +102,13 @@ def geo_indexer(indexer_dims_shape_chunks, indexer_array_lib):
     """Indexer dataset with coords longitude and latitude of parametrized shapes."""
     dims, shape, chunks = indexer_dims_shape_chunks
 
-    if indexer_array_lib is dask.array:
+    if indexer_array_lib is da:
         kwargs = {"size": shape, "chunks": chunks}
     else:
         kwargs = {"size": shape}
 
-    latitude = xr.DataArray(
-        indexer_array_lib.random.uniform(-80, 80, **kwargs), dims=dims
-    )
-    longitude = xr.DataArray(
-        indexer_array_lib.random.uniform(-160, 160, **kwargs), dims=dims
-    )
+    latitude = xr.DataArray(indexer_array_lib.random.uniform(-80, 80, **kwargs), dims=dims)
+    longitude = xr.DataArray(indexer_array_lib.random.uniform(-160, 160, **kwargs), dims=dims)
 
     ds = xr.Dataset(coords={"latitude": latitude, "longitude": longitude})
 
@@ -119,9 +116,7 @@ def geo_indexer(indexer_dims_shape_chunks, indexer_array_lib):
 
 
 @pytest.fixture(scope="session")
-def geo_expected(
-    geo_dataset, dataset_dims_shape_chunks, geo_indexer, indexer_dims_shape_chunks
-):
+def geo_expected(geo_dataset, dataset_dims_shape_chunks, geo_indexer, indexer_dims_shape_chunks):
     return query_brute_force(
         geo_dataset,
         dataset_dims_shape_chunks,
@@ -136,7 +131,7 @@ def xyz_dataset(dataset_dims_shape_chunks, dataset_array_lib):
     """Dataset with coords x, y, z on a grid of different shapes."""
     dims, shape, chunks = dataset_dims_shape_chunks
 
-    if dataset_array_lib is dask.array:
+    if dataset_array_lib is da:
         kwargs = {"size": shape, "chunks": chunks}
     else:
         kwargs = {"size": shape}
@@ -155,7 +150,7 @@ def xyz_indexer(indexer_dims_shape_chunks, indexer_array_lib):
     """Indexer dataset with coords xx, yy, zz of parametrized shapes."""
     dims, shape, chunks = indexer_dims_shape_chunks
 
-    if indexer_array_lib is dask.array:
+    if indexer_array_lib is da:
         kwargs = {"size": shape, "chunks": chunks}
     else:
         kwargs = {"size": shape}
@@ -170,9 +165,7 @@ def xyz_indexer(indexer_dims_shape_chunks, indexer_array_lib):
 
 
 @pytest.fixture(scope="session")
-def xyz_expected(
-    xyz_dataset, dataset_dims_shape_chunks, xyz_indexer, indexer_dims_shape_chunks
-):
+def xyz_expected(xyz_dataset, dataset_dims_shape_chunks, xyz_indexer, indexer_dims_shape_chunks):
     return query_brute_force(
         xyz_dataset, dataset_dims_shape_chunks, xyz_indexer, indexer_dims_shape_chunks
     )
