@@ -8,7 +8,7 @@ version.source = "vcs"
 [tool.hatch.metadata.hooks.vcs]
 
 [tool.hatch.build.targets.sdist]
-only-include = ["xoak"]
+only-include = ["src/xoak"]
 
 [project]
 name = "xoak"
