@@ -13,7 +13,6 @@ conda:
     environment: environment_doc.yml
 
 python:
-  version: 3.8
   install:
     - method: pip
       path: .
