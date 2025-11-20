@@ -11,3 +11,5 @@ dependencies:
   - pys2index
   - pytest
   - pytest-cov
+  - pydata-sphinx-theme=0.15.4
+  - sphinx-book-theme=1.1.4

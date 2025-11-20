@@ -66,17 +66,18 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_book_theme"
+html_title = "Xoak"
 
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-# html_theme_options = {
-#    "github_url": "https://github.com/xarray-contrib/xoak",
-#    "use_edit_page_button": True,
-#    "search_bar_position": "navbar",
-# }
-
+html_theme_options = dict(
+    repository_url="https://github.com/xarray-contrib/xoak",
+    repository_branch="master",
+    path_to_docs="doc",
+    use_edit_page_button=True,
+    use_repository_button=True,
+    use_issues_button=True,
+    home_page_in_toc=False,
+)
 
 html_context = {
     "github_user": "xarray-contrib",
@@ -85,22 +86,11 @@ html_context = {
     "doc_path": "doc",
 }
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+html_css_files = ["style.css"]
 
-
-# Enable notebook execution
-# https://nbsphinx.readthedocs.io/en/0.4.2/never-execute.html
-# nbsphinx_execute = 'auto'
-# Allow errors in all notebooks by
-# nbsphinx_allow_errors = True
 nbsphinx_kernel_name = "python3"
-
-# Disable cell timeout
 nbsphinx_timeout = -1
-
 nbsphinx_prolog = """
 {% set docname = env.doc2path(env.docname, base=None) %}
 
