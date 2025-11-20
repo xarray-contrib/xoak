@@ -1,0 +1,11 @@
+name: xoak
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - numpy
+  - xarray
+  - dask
+  - scipy
+  - scikit-learn
+  - pys2index
