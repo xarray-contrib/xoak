@@ -1,7 +1,11 @@
 # Required
 version: 2
 
-# Build documentation in the doc/ directory with Sphinx
+build:
+  os: "ubuntu-20.04"
+  tools:
+    python: "mambaforge-4.10"
+
 sphinx:
   configuration: doc/conf.py
 
@@ -13,3 +17,5 @@ python:
   install:
     - method: pip
       path: .
+
+formats: []
