@@ -1,25 +1,21 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.3.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-docstring-first
       - id: check-yaml
-      - id: double-quote-string-fixer
 
-  - repo: https://github.com/ambv/black
-    rev: 20.8b1
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.5
     hooks:
-      - id: black
-        args: ["--line-length", "100", "--skip-string-normalization"]
+      - id: ruff-format
+        types_or: [ python, pyi ]
+      - id: ruff
+        args: [--fix]
+        types_or: [ python, pyi ]
 
-  - repo: https://gitlab.com/PyCQA/flake8
-    rev: 3.8.4
-    hooks:
-      - id: flake8
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.6.4
-    hooks:
-      - id: isort
+ci:
+  autofix_prs: false
+  autoupdate_schedule: quarterly
