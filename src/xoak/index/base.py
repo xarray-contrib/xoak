@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Mapping, Tuple, Type, TypeVar, Union
 
 import numpy as np
 
-Index = TypeVar('Index')
+Index = TypeVar("Index")
 
 
 class IndexAdapter(abc.ABC):
@@ -109,7 +109,7 @@ class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
 
         def wrap(cls: Type[IndexAdapter]):
             if not issubclass(cls, IndexAdapter):
-                raise TypeError('can only register IndexAdapter subclasses.')
+                raise TypeError("can only register IndexAdapter subclasses.")
 
             if name in self._indexes:
                 warnings.warn(
@@ -125,20 +125,20 @@ class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
         return wrap
 
     def __getattr__(self, name):
-        if name not in {'__dict__', '__setstate__'}:
+        if name not in {"__dict__", "__setstate__"}:
             # this avoids an infinite loop when pickle looks for the
             # __setstate__ attribute before the xarray object is initialized
             with suppress(KeyError):
                 return self._indexes[name]
-        raise AttributeError(f'IndexRegistry object has no attribute {name!r}')
+        raise AttributeError(f"IndexRegistry object has no attribute {name!r}")
 
     def __setattr__(self, name, value):
-        if name == '_indexes':
+        if name == "_indexes":
             object.__setattr__(self, name, value)
         else:
             raise AttributeError(
-                f'cannot set attribute {name!r} on a IndexRegistry object. '
-                'Use `.register()` to add a new index adapter to the registry.'
+                f"cannot set attribute {name!r} on a IndexRegistry object. "
+                "Use `.register()` to add a new index adapter to the registry."
             )
 
     def __dir__(self):
@@ -158,8 +158,8 @@ class IndexRegistry(Mapping[str, Type[IndexAdapter]]):
         return len(self._indexes)
 
     def __repr__(self):
-        header = f'<IndexRegistry ({len(self._indexes)} indexes)>\n'
-        return header + '\n'.join([name for name in self._indexes])
+        header = f"<IndexRegistry ({len(self._indexes)} indexes)>\n"
+        return header + "\n".join([name for name in self._indexes])
 
 
 def register_default(name: str):
@@ -191,7 +191,6 @@ def register_default(name: str):
 
 
 def normalize_index(name_or_cls: Union[str, Any]) -> Type[IndexAdapter]:
-
     if isinstance(name_or_cls, str):
         cls = IndexRegistry._default_indexes[name_or_cls]
     else:
@@ -210,8 +209,8 @@ class XoakIndexWrapper:
     """
 
     _query_result_dtype: List[Tuple[str, Any]] = [
-        ('distances', np.double),
-        ('indices', np.intp),
+        ("distances", np.double),
+        ("indices", np.intp),
     ]
 
     def __init__(
@@ -235,7 +234,7 @@ class XoakIndexWrapper:
         distances, positions = self._index_adapter.query(self._index, points)
 
         result = np.empty(shape=points.shape[0], dtype=self._query_result_dtype)
-        result['distances'] = distances.ravel().astype(np.double)
-        result['indices'] = positions.ravel().astype(np.intp) + self._offset
+        result["distances"] = distances.ravel().astype(np.double)
+        result["indices"] = positions.ravel().astype(np.intp) + self._offset
 
         return result[:, None]

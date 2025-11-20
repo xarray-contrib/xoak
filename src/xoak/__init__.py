@@ -7,6 +7,12 @@ except ImportError:
 from .accessor import XoakAccessor
 from .index import IndexAdapter, IndexRegistry
 
+__all__ = [
+    "XoakAccessor",
+    "IndexAdapter",
+    "IndexRegistry",
+]
+
 try:
     __version__ = version(__name__)
 except PackageNotFoundError:  # pragma: no cover

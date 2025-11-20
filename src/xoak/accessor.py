@@ -38,8 +38,8 @@ IndexAttr = Union[XoakIndexWrapper, Iterable[XoakIndexWrapper], Iterable[Delayed
 IndexType = Union[str, Type[IndexAdapter]]
 
 
-@xr.register_dataarray_accessor('xoak')
-@xr.register_dataset_accessor('xoak')
+@xr.register_dataarray_accessor("xoak")
+@xr.register_dataset_accessor("xoak")
 class XoakAccessor:
     """A xarray Dataset or DataArray extension for indexing irregular,
     n-dimensional data using a ball tree.
@@ -63,7 +63,9 @@ class XoakAccessor:
 
         for i, chunk in enumerate(X.to_delayed().ravel()):
             indexes.append(
-                dask.delayed(XoakIndexWrapper)(self._index_type, chunk, offset, **kwargs)
+                dask.delayed(XoakIndexWrapper)(
+                    self._index_type, chunk, offset, **kwargs
+                )
             )
             offset += X.chunks[0][i]
 
@@ -73,7 +75,11 @@ class XoakAccessor:
             return tuple(indexes)
 
     def set_index(
-        self, coords: Iterable[str], index_type: IndexType, persist: bool = True, **kwargs
+        self,
+        coords: Iterable[str],
+        index_type: IndexType,
+        persist: bool = True,
+        **kwargs,
     ):
         """Create an index tree from a subset of coordinates of the DataArray / Dataset.
 
@@ -102,7 +108,7 @@ class XoakAccessor:
 
         if len(set([c.dims for c in coord_objs])) > 1:
             raise ValueError(
-                'Coordinates {coords} must all have the same dimensions in the same order'
+                "Coordinates {coords} must all have the same dimensions in the same order"
             )
 
         self._index_coords_dims = coord_objs[0].dims
@@ -123,7 +129,7 @@ class XoakAccessor:
         May trigger computation of lazy indexes.
 
         """
-        if not getattr(self, '_index', False):
+        if not getattr(self, "_index", False):
             return None
         elif isinstance(self._index, XoakIndexWrapper):
             return self._index.index
@@ -139,7 +145,7 @@ class XoakAccessor:
         if isinstance(X, np.ndarray) and isinstance(self._index, XoakIndexWrapper):
             # directly call index wrapper's query method
             res = self._index.query(X)
-            results = res['indices'][:, 0]
+            results = res["indices"][:, 0]
 
         else:
             # Two-stage lazy query with dask
@@ -170,14 +176,16 @@ class XoakAccessor:
                 for idx in indexes:
                     dlyd = dask.delayed(idx.query)(chunk)
                     res_chunk_idx.append(
-                        da.from_delayed(dlyd, shape, dtype=XoakIndexWrapper._query_result_dtype)
+                        da.from_delayed(
+                            dlyd, shape, dtype=XoakIndexWrapper._query_result_dtype
+                        )
                     )
 
                 res_chunk.append(da.concatenate(res_chunk_idx, axis=1))
 
             map_results = da.concatenate(res_chunk, axis=0)
-            distances = map_results['distances']
-            indices = map_results['indices']
+            distances = map_results["distances"]
+            indices = map_results["indices"]
 
             # 2nd "reduce" stage:
             # - brute force lookup over the indexes dimension (columns)
@@ -186,11 +194,11 @@ class XoakAccessor:
 
             results = da.blockwise(
                 lambda arr, icol: np.take_along_axis(arr, icol[:, None], 1).squeeze(),
-                'i',
+                "i",
                 indices,
-                'ik',
+                "ik",
                 indices_col,
-                'i',
+                "i",
                 dtype=np.intp,
                 concatenate=True,
             )
@@ -212,7 +220,7 @@ class XoakAccessor:
         indexer_shapes = [idx.shape for idx in indexers.values()]
 
         if len(set(indexer_dims)) > 1:
-            raise ValueError('All indexers must have the same dimensions.')
+            raise ValueError("All indexers must have the same dimensions.")
 
         u_indices = list(np.unravel_index(indices.ravel(), self._index_coords_shape))
 
@@ -244,12 +252,12 @@ class XoakAccessor:
         coordinates are chunked.
 
         """
-        if not getattr(self, '_index', False):
+        if not getattr(self, "_index", False):
             raise ValueError(
-                'The index(es) has/have not been built yet. Call `.xoak.set_index()` first'
+                "The index(es) has/have not been built yet. Call `.xoak.set_index()` first"
             )
 
-        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, 'xoak.sel')
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "xoak.sel")
         indices = self._query(indexers)
 
         if not isinstance(indices, np.ndarray):

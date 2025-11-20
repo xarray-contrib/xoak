@@ -61,60 +61,62 @@ def test_index_registery_constructor():
 
 def test_index_registery_register():
     registry = IndexRegistry(use_default=False)
-    registry.register('dummy')(DummyIndexAdapter)
+    registry.register("dummy")(DummyIndexAdapter)
 
-    with pytest.warns(IndexRegistrationWarning, match='overriding an already registered index.*'):
-        registry.register('dummy')(DummyIndexAdapter)
+    with pytest.warns(
+        IndexRegistrationWarning, match="overriding an already registered index.*"
+    ):
+        registry.register("dummy")(DummyIndexAdapter)
 
-    with pytest.raises(TypeError, match='can only register IndexAdapter subclasses.'):
-        registry.register('invalid')(DummyIndex)
+    with pytest.raises(TypeError, match="can only register IndexAdapter subclasses."):
+        registry.register("invalid")(DummyIndex)
 
 
 def test_index_registry_dict_interface():
     registry = IndexRegistry(use_default=False)
-    registry.register('dummy')(DummyIndexAdapter)
+    registry.register("dummy")(DummyIndexAdapter)
 
-    assert registry['dummy'] is DummyIndexAdapter
-    assert list(registry) == ['dummy']
+    assert registry["dummy"] is DummyIndexAdapter
+    assert list(registry) == ["dummy"]
     assert len(registry) == 1
-    assert repr(registry) == '<IndexRegistry (1 indexes)>\ndummy'
+    assert repr(registry) == "<IndexRegistry (1 indexes)>\ndummy"
 
 
 def test_index_registry_attr_access():
     registry = IndexRegistry(use_default=False)
-    registry.register('dummy')(DummyIndexAdapter)
+    registry.register("dummy")(DummyIndexAdapter)
 
     assert registry.dummy is DummyIndexAdapter
-    assert 'dummy' in dir(registry)
+    assert "dummy" in dir(registry)
 
-    with pytest.raises(AttributeError, match='.*has no attribute.*'):
+    with pytest.raises(AttributeError, match=".*has no attribute.*"):
         registry.invalid_attr
 
-    with pytest.raises(AttributeError, match='.*cannot set attribute.*'):
+    with pytest.raises(AttributeError, match=".*cannot set attribute.*"):
         registry.custom = DummyIndexAdapter
 
 
 def test_index_registry_ipython_completion():
     registry = IndexRegistry(use_default=False)
-    registry.register('dummy')(DummyIndexAdapter)
+    registry.register("dummy")(DummyIndexAdapter)
 
-    assert 'dummy' in registry._ipython_key_completions_()
+    assert "dummy" in registry._ipython_key_completions_()
 
 
 def test_register_default():
     # check that docstrings are updated
-    assert 'This index adapter is registered in xoak' in ScipyKDTreeAdapter.__doc__
+    assert "This index adapter is registered in xoak" in ScipyKDTreeAdapter.__doc__
 
-    register_default('dummy')(DummyIndexAdapter)
-    assert 'This index adapter is registered in xoak' in DummyIndexAdapter.__doc__
-    del IndexRegistry._default_indexes['dummy']
+    register_default("dummy")(DummyIndexAdapter)
+    assert "This index adapter is registered in xoak" in DummyIndexAdapter.__doc__
+    del IndexRegistry._default_indexes["dummy"]
 
 
 def test_normalize_index():
     assert normalize_index(DummyIndexAdapter) is DummyIndexAdapter
-    assert normalize_index('scipy_kdtree') is ScipyKDTreeAdapter
+    assert normalize_index("scipy_kdtree") is ScipyKDTreeAdapter
 
-    with pytest.raises(TypeError, match='.*is not a subclass of IndexAdapter'):
+    with pytest.raises(TypeError, match=".*is not a subclass of IndexAdapter"):
         normalize_index(DummyIndex)
 
 
@@ -132,7 +134,7 @@ def test_xoak_index_wrapper():
 
     results = wrapper.query(np.zeros((5, 2))).ravel()
 
-    assert results['distances'].dtype == np.double
-    assert results['indices'].dtype == np.intp
-    np.testing.assert_equal(results['distances'], np.zeros(5))
-    np.testing.assert_equal(results['indices'], np.ones(5) + offset)
+    assert results["distances"].dtype == np.double
+    assert results["indices"].dtype == np.intp
+    np.testing.assert_equal(results["distances"], np.zeros(5))
+    np.testing.assert_equal(results["indices"], np.ones(5) + offset)

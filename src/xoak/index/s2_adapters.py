@@ -3,7 +3,7 @@ from pys2index import S2PointIndex
 from .base import IndexAdapter, register_default
 
 
-@register_default('s2point')
+@register_default("s2point")
 class S2PointIndexAdapter(IndexAdapter):
     """Xoak index adapter for :class:`pys2index.S2PointIndex`.
 

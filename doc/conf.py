@@ -13,7 +13,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../src/xoak/'))
+sys.path.insert(0, os.path.abspath("../src/xoak/"))
 
 import sphinx_autosummary_accessors
 
@@ -21,44 +21,44 @@ import xoak  # noqa
 
 # -- Project information -----------------------------------------------------
 
-project = 'xoak'
-copyright = '2020, Benoît Bovy, Willi Rath'
-author = 'Benoît Bovy, Willi Rath'
+project = "xoak"
+copyright = "2020, Benoît Bovy, Willi Rath"
+author = "Benoît Bovy, Willi Rath"
 
 
 # -- General configuration ---------------------------------------------------
 
-master_doc = 'index'
+master_doc = "index"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.extlinks',
-    'sphinx_autosummary_accessors',
-    'nbsphinx',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.extlinks",
+    "sphinx_autosummary_accessors",
+    "nbsphinx",
 ]
 
 extlinks = {
-    'issue': ('https://github.com/xarray-contrib/xoak/issues/%s', '#'),
-    'pull': ('https://github.com/xarray-contrib/xoak/pull/%s', '#'),
+    "issue": ("https://github.com/xarray-contrib/xoak/issues/%s", "#"),
+    "pull": ("https://github.com/xarray-contrib/xoak/pull/%s", "#"),
 }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = [
-    '_templates',
+    "_templates",
     sphinx_autosummary_accessors.templates_path,
 ]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -66,7 +66,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -79,16 +79,16 @@ html_theme = 'sphinx_rtd_theme'
 
 
 html_context = {
-    'github_user': 'xarray-contrib',
-    'github_repo': 'xoak',
-    'github_version': 'master',
-    'doc_path': 'doc',
+    "github_user": "xarray-contrib",
+    "github_repo": "xoak",
+    "github_version": "master",
+    "doc_path": "doc",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 
 # Enable notebook execution
@@ -96,7 +96,7 @@ html_static_path = ['_static']
 # nbsphinx_execute = 'auto'
 # Allow errors in all notebooks by
 # nbsphinx_allow_errors = True
-nbsphinx_kernel_name = 'python3'
+nbsphinx_kernel_name = "python3"
 
 # Disable cell timeout
 nbsphinx_timeout = -1
@@ -115,15 +115,15 @@ docname }}>`_ or view it `on Github <https://github.com/xarray-contrib/xoak/blob
 
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3/', None),
-    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
-    'sklearn': ('http://scikit-learn.org/stable', None),
-    'xarray': ('http://xarray.pydata.org/en/stable/', None),
+    "python": ("https://docs.python.org/3/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "sklearn": ("http://scikit-learn.org/stable", None),
+    "xarray": ("http://xarray.pydata.org/en/stable/", None),
 }
 
 autosummary_generate = True
 
-autodoc_typehints = 'none'
+autodoc_typehints = "none"
 
 napoleon_use_param = True
 napoleon_use_rtype = True
