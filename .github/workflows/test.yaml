@@ -12,6 +12,9 @@ jobs:
   test:
     name: pytest (${{ matrix.os }}, ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       fail-fast: false
       matrix:
@@ -23,19 +26,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup micromamba
+        uses: mamba-org/setup-micromamba@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          environment-file: ci/environment.yml
+          cache-environment: true
+          cache-downloads: false
+          create-args: >-
+            python=${{ matrix.python-version }}
 
       - name: Install xoak
         run: |
-          python -m pip install -e .[test,extras]
-          python -m pip install pytest-cov
+          python -m pip install .
 
       - name: Run tests
         run: |
-          python -m pytest --cov=xoak --color=yes
+          python -m pytest -vv --cov=xoak --color=yes src/xoak/tests
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v5
