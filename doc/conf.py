@@ -45,8 +45,8 @@ extensions = [
 ]
 
 extlinks = {
-    "issue": ("https://github.com/xarray-contrib/xoak/issues/%s", "#"),
-    "pull": ("https://github.com/xarray-contrib/xoak/pull/%s", "#"),
+    "issue": ("https://github.com/xarray-contrib/xoak/issues/%s", "#%s"),
+    "pull": ("https://github.com/xarray-contrib/xoak/pull/%s", "#%s"),
 }
 
 # Add any paths that contain templates here, relative to this directory.
