@@ -12,6 +12,7 @@ dependencies:
   - scikit-learn
   - sphinx
   - sphinx-autosummary-accessors
-  - sphinx_rtd_theme
+  - pydata-sphinx-theme=0.15.4
+  - sphinx-book-theme=1.1.4
   - xarray
   - pip
