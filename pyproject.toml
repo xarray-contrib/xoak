@@ -33,7 +33,7 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "xarray",
+  "xarray>=2025.07.1",
   "numpy",
   "scipy",
   "dask",
