@@ -88,6 +88,12 @@ class XoakAccessor:
         If the given coordinates are chunked (Dask arrays), this method will (lazily) create
         a forest of index trees (one tree per chunk of the flattened coordinate arrays).
 
+        .. warning::
+           This method has been deprecated. Please use the Xarray API instead, e.g.,
+           ``ds.set_xindex([...], xarray.indexes.NDPointIndex, tree_adapter_cls=...)``.
+
+           Support for chunked Dask coordinates has been deprecated as well.
+
         Parameters
         ----------
         coords : iterable
@@ -123,7 +129,7 @@ class XoakAccessor:
                 "Setting the index via the xoak accessor is deprecated and will be removed "
                 f"in a future version. Instead of `.xoak.set_index({coords!r}, ...)`, "
                 f"use the Xarray API `.set_xindex({coords!r}, xarray.indexes.NDPointIndex, "
-                f"tree_adapter_cls=...)`",
+                "tree_adapter_cls=...)`",
                 FutureWarning,
                 stacklevel=2,
             )
@@ -251,6 +257,11 @@ class XoakAccessor:
         self, indexers: Mapping[Hashable, Any] | None = None, **indexers_kwargs: Any
     ) -> xr.Dataset | xr.DataArray:
         """Selection based on a ball tree index.
+
+        .. warning::
+           This method has been deprecated. Please use the Xarray API instead
+           ``ds.sel(...)`` after setting an ``xarray.indexes.NDPointIndex`` with one
+           of the tree adapter classes available in Xoak.
 
         The index must have been already built using `xoak.set_index()`.
 
