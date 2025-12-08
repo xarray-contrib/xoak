@@ -95,7 +95,7 @@ class SklearnGeoBallTreeAdapter(TreeAdapter):
         opts = dict(options)
         opts.update({"metric": "haversine"})
 
-        self._balltree = BallTree(np.deg2rad(points), **options)
+        self._balltree = BallTree(np.deg2rad(points), **opts)
 
     def query(self, points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         return self._balltree.query(np.deg2rad(points))
