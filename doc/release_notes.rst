@@ -3,6 +3,28 @@
 Release Notes
 =============
 
+v0.2.0 (Unreleased)
+-------------------
+
+Features
+~~~~~~~~
+
+- Xoak now relies on :py:class:`xarray.indexes.NDPointIndex` for point-wise
+  indexing of irregular data, by providing custom ``TreeAdapter`` classes.
+  The current functionality remains the same. See documentation examples
+  for more details (:pull:`44`).
+
+Deprecations
+------------
+
+- Xoak specific API :py:meth:`xarray.Dataset.xoak.set_index` and
+  :py:meth:`xarray.Dataset.xoak.sel` has been deprecated in favor of Xarray's
+  API :py:meth:`xarray.Dataset.set_xindex` and :py:meth:`xarray.Dataset.sel`.
+  See documentation examples for more details (:pull:`44`).
+- Xoak experimental support for chunked coordinates (Dask arrays) has been
+  deprecated (:pull:`44`).
+
+
 v0.1.2 (20 November 2025)
 -------------------------
 
