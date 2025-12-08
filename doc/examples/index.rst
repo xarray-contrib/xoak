@@ -5,5 +5,4 @@ Examples
    :maxdepth: 2
 
    introduction
-   dask_support
    custom_indexes
